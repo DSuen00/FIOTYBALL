@@ -113,11 +113,7 @@ void setup() {
 }
 
 void loop() {
-  unsigned long currentMillis = millis();
-  if (currentMillis - previousMillis >= timerInterval) {
-    sendPhoto();
-    previousMillis = currentMillis;
-  }
+  sendPhoto();
 }
 
 String sendPhoto() {
@@ -146,9 +142,10 @@ String sendPhoto() {
     client.println("POST " + serverPath + " HTTP/1.1");
     client.println("Host: " + serverName);
     client.println("Content-Length: " + String(totalLen));
-    client.println("Content-Type: multipart/form-data; boundary=RandomNerdTutorials");
+    // client.println("Content-Type: multipart/form-data; boundary=RandomNerdTutorials");
+    client.println("Content-Type: multipart/form-data");
     client.println();
-    client.print(head);
+    // client.print(head);
   
     uint8_t *fbBuf = fb->buf;
     size_t fbLen = fb->len;
@@ -162,32 +159,32 @@ String sendPhoto() {
         client.write(fbBuf, remainder);
       }
     }   
-    client.print(tail);
+    // client.print(tail);
     
     esp_camera_fb_return(fb);
     
-    int timoutTimer = 10000;
-    long startTimer = millis();
-    boolean state = false;
+    // int timoutTimer = 10000;
+    // long startTimer = millis();
+    // boolean state = false;
     
-    while ((startTimer + timoutTimer) > millis()) {
-      Serial.print(".");
-      delay(100);      
-      while (client.available()) {
-        char c = client.read();
-        if (c == '\n') {
-          if (getAll.length()==0) { state=true; }
-          getAll = "";
-        }
-        else if (c != '\r') { getAll += String(c); }
-        if (state==true) { getBody += String(c); }
-        startTimer = millis();
-      }
-      if (getBody.length()>0) { break; }
-    }
-    Serial.println();
-    client.stop();
-    Serial.println(getBody);
+    // while ((startTimer + timoutTimer) > millis()) {
+    //   Serial.print(".");
+    //   delay(100);      
+    //   while (client.available()) {
+    //     char c = client.read();
+    //     if (c == '\n') {
+    //       if (getAll.length()==0) { state=true; }
+    //       getAll = "";
+    //     }
+    //     else if (c != '\r') { getAll += String(c); }
+    //     if (state==true) { getBody += String(c); }
+    //     startTimer = millis();
+    //   }
+    //   if (getBody.length()>0) { break; }
+    // }
+    // Serial.println();
+    // client.stop();
+    // Serial.println(getBody);
   }
   else {
     getBody = "Connection to " + serverName +  " failed.";

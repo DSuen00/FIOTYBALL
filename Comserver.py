@@ -1,15 +1,36 @@
 from http.server import SimpleHTTPRequestHandler, HTTPServer
 import cgi
 import socket
+import os
+import pygame
+
+pygame.init()
+
+width, height = 800, 600
+screen = pygame.display.set_mode((width, height))
+screen.fill((255, 255, 255))  # Fill with white background color
+
+def drawImage(path):
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+    image = pygame.image.load(path)
+
+    # Blit (draw) the image at position (x, y)
+    x, y = 100, 100
+    screen.blit(image, (x, y))
+
+    # Update the display
+    pygame.display.flip()
 
 class webserverHandler(SimpleHTTPRequestHandler):
     """docstring for webserverHandler"""
 
     def do_GET(self):
         try:
-            if self.path.endswith("/hello"):
+            if self.path.endswith("/motor"):
                 self.send_response(200)
-                self.send_header('Content-Type', 'text/html')
+                self.send_header('Content-Type', 'data')
                 self.end_headers()
 
                 output = ""
@@ -20,7 +41,7 @@ class webserverHandler(SimpleHTTPRequestHandler):
                 print(output)
                 return
 
-            if self.path.endswith("/hola"):
+            if self.path.endswith("/check"):
                 self.send_response(200)
                 self.send_header('Content-Type', 'text/html')
                 self.end_headers()
@@ -37,26 +58,25 @@ class webserverHandler(SimpleHTTPRequestHandler):
             self.send_error(404, "File not found %s" % self.path)
 
     def do_POST(self):
-        try:
-            self.send_response(301)
-            self.send_header('Content-Type', 'text/html')
-            self.end_headers()
-            ctype, pdict = cgi.parse_header(self.headers.get('Content-Type'))
-            pdict['boundary'] = bytes(pdict['boundary'], "utf-8")
-            if ctype == 'multipart/form-data':
-                fields = cgi.parse_multipart(self.rfile, pdict)
-                messagecontent = fields.get('message')
-            output = ''
-            output += '<html><body>'
-            output += '<h2> Okay, how about this: </h2>'
-            output += '<h1> %s </h1>' % messagecontent[0].decode("utf-8")
-            output += '<form method="POST" enctype="multipart/form-data" action="/hello"><h2> What would you like me to say?</h2><input name="message" type="text" /><input type="submit" value="Submit" /></form>'
-            output += '</body></html>'
-            self.wfile.write(output.encode())
-            print(output)
-        except:
-            self.send_error(404, "{}".format(sys.exc_info()[0]))
-            print(sys.exc_info())
+        content_length = int(self.headers['Content-Length'])
+        content_type = self.headers['Content-Type']
+
+        if content_type.startswith('multipart/form-data'):
+            # Process the multipart data
+            form_data = self.rfile.read(content_length)
+            # Split the form data into individual parts using the boundary
+            # if "image/jpeg" in form_data:
+                # Extract the image data
+            image_data = form_data
+                # Save the image data to a file
+            with open("uploaded_image.jpg", "wb") as image_file:
+                image_file.write(image_data)
+
+        # Respond with a success message
+        self.send_response(200)
+        self.send_header('Content-Type', 'text/plain')
+        self.end_headers()
+        self.wfile.write("Image uploaded successfully".encode('utf-8'))
 
 def get_local_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -77,10 +97,11 @@ def main():
         port = 8000
         server = HTTPServer((host, port), webserverHandler)
         print("Web server running on {}:{}".format(host, port))
+        drawImage("uploaded_image.jpg")
         server.serve_forever()
-
     except KeyboardInterrupt:
         print(" ^C entered stopping web server...")
+        pygame.quit()
         server.socket.close()
 
 if __name__ == '__main__':
