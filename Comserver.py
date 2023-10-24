@@ -2,26 +2,7 @@ from http.server import SimpleHTTPRequestHandler, HTTPServer
 import cgi
 import socket
 import os
-import pygame
 
-pygame.init()
-
-width, height = 800, 600
-screen = pygame.display.set_mode((width, height))
-screen.fill((255, 255, 255))  # Fill with white background color
-
-def drawImage(path):
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-    image = pygame.image.load(path)
-
-    # Blit (draw) the image at position (x, y)
-    x, y = 100, 100
-    screen.blit(image, (x, y))
-
-    # Update the display
-    pygame.display.flip()
 
 class webserverHandler(SimpleHTTPRequestHandler):
     """docstring for webserverHandler"""
@@ -74,9 +55,6 @@ class webserverHandler(SimpleHTTPRequestHandler):
 
         # Respond with a success message
         self.send_response(200)
-        self.send_header('Content-Type', 'text/plain')
-        self.end_headers()
-        self.wfile.write("Image uploaded successfully".encode('utf-8'))
 
 def get_local_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -97,11 +75,9 @@ def main():
         port = 8000
         server = HTTPServer((host, port), webserverHandler)
         print("Web server running on {}:{}".format(host, port))
-        drawImage("uploaded_image.jpg")
         server.serve_forever()
     except KeyboardInterrupt:
         print(" ^C entered stopping web server...")
-        pygame.quit()
         server.socket.close()
 
 if __name__ == '__main__':
