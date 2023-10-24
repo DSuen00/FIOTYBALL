@@ -35,7 +35,8 @@
 // Enter your WiFi credentials
 // ===========================
 const char* ssid = "Berkeley-IoT";
-const char* password = "0%$MB,(y";
+// const char* password = "0%$MB,(y";
+const char* password = "0uW8&mx,"; //short cam
 
 void startCameraServer();
 void setupLedFlash(int pin);
