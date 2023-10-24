@@ -1,7 +1,8 @@
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import SimpleHTTPRequestHandler, HTTPServer
 import cgi
+import socket
 
-class webserverHandler(BaseHTTPRequestHandler):
+class webserverHandler(SimpleHTTPRequestHandler):
     """docstring for webserverHandler"""
 
     def do_GET(self):
@@ -57,12 +58,25 @@ class webserverHandler(BaseHTTPRequestHandler):
             self.send_error(404, "{}".format(sys.exc_info()[0]))
             print(sys.exc_info())
 
-
+def get_local_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        # doesn't even have to be reachable
+        s.connect(('192.255.255.255', 1))
+        IP = s.getsockname()[0]
+    except:
+        IP = '127.0.0.1'
+    finally:
+        s.close()
+    return IP
+ 
 def main():
     try:
+        
+        host = get_local_ip()
         port = 8000
-        server = HTTPServer(('', port), webserverHandler)
-        print("Web server running on port %s" % port)
+        server = HTTPServer((host, port), webserverHandler)
+        print("Web server running on {}:{}".format(host, port))
         server.serve_forever()
 
     except KeyboardInterrupt:

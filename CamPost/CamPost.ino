@@ -16,15 +16,16 @@
 #include "esp_camera.h"
 
 const char* ssid = "Berkeley-IoT";
-// const char* password = "0%$MB,(y";
+// // const char* password = "0%$MB,(y";
 const char* password = "0uW8&mx,"; //short cam
 
-String serverName = "192.168.1.XXX";   // REPLACE WITH YOUR Raspberry Pi IP ADDRESS
+
+String serverName = "10.40.65.83";   // REPLACE WITH YOUR Raspberry Pi IP ADDRESS
 //String serverName = "example.com";   // OR REPLACE WITH YOUR DOMAIN NAME
 
-String serverPath = "/upload.php";     // The default serverPath should be upload.php
+String serverPath = "/hello";     // The default serverPath should be upload.php
 
-const int serverPort = 80;
+const int serverPort = 8000;
 
 WiFiClient client;
 
