@@ -20,7 +20,7 @@ const char* ssid = "Berkeley-IoT";
 const char* password = "0uW8&mx,"; //short cam
 
 
-String serverName = "10.40.65.83";   // REPLACE WITH YOUR Raspberry Pi IP ADDRESS
+String serverName = "10.40.66.202";   // REPLACE WITH YOUR Raspberry Pi IP ADDRESS
 //String serverName = "example.com";   // OR REPLACE WITH YOUR DOMAIN NAME
 
 String serverPath = "/hello";     // The default serverPath should be upload.php
@@ -54,7 +54,7 @@ unsigned long previousMillis = 0;   // last time image was sent
 void setup() {
   WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0); 
   Serial.begin(115200);
-
+  pinMode(OUTPUT,2);
   WiFi.mode(WIFI_STA);
   Serial.println();
   Serial.print("Connecting to ");
@@ -93,7 +93,7 @@ void setup() {
   // init with high specs to pre-allocate larger buffers
   if(psramFound()){
     config.frame_size = FRAMESIZE_SVGA;
-    config.jpeg_quality = 10;  //0-63 lower number means higher quality
+    config.jpeg_quality = 30;  //0-63 lower number means higher quality
     config.fb_count = 2;
   } else {
     config.frame_size = FRAMESIZE_CIF;
@@ -132,20 +132,16 @@ String sendPhoto() {
 
   if (client.connect(serverName.c_str(), serverPort)) {
     Serial.println("Connection successful!");    
-    String head = "--RandomNerdTutorials\r\nContent-Disposition: form-data; name=\"imageFile\"; filename=\"esp32-cam.jpg\"\r\nContent-Type: image/jpeg\r\n\r\n";
-    String tail = "\r\n--RandomNerdTutorials--\r\n";
 
     uint32_t imageLen = fb->len;
-    uint32_t extraLen = head.length() + tail.length();
-    uint32_t totalLen = imageLen + extraLen;
+    // uint32_t extraLen = head.length() + tail.length();
+    uint32_t totalLen = imageLen;
   
     client.println("POST " + serverPath + " HTTP/1.1");
     client.println("Host: " + serverName);
     client.println("Content-Length: " + String(totalLen));
-    // client.println("Content-Type: multipart/form-data; boundary=RandomNerdTutorials");
     client.println("Content-Type: multipart/form-data");
     client.println();
-    // client.print(head);
   
     uint8_t *fbBuf = fb->buf;
     size_t fbLen = fb->len;
@@ -159,32 +155,9 @@ String sendPhoto() {
         client.write(fbBuf, remainder);
       }
     }   
-    // client.print(tail);
-    
+    digitalWrite(3,HIGH);
+    digitalWrite(3,LOW);
     esp_camera_fb_return(fb);
-    
-    // int timoutTimer = 10000;
-    // long startTimer = millis();
-    // boolean state = false;
-    
-    // while ((startTimer + timoutTimer) > millis()) {
-    //   Serial.print(".");
-    //   delay(100);      
-    //   while (client.available()) {
-    //     char c = client.read();
-    //     if (c == '\n') {
-    //       if (getAll.length()==0) { state=true; }
-    //       getAll = "";
-    //     }
-    //     else if (c != '\r') { getAll += String(c); }
-    //     if (state==true) { getBody += String(c); }
-    //     startTimer = millis();
-    //   }
-    //   if (getBody.length()>0) { break; }
-    // }
-    // Serial.println();
-    // client.stop();
-    // Serial.println(getBody);
   }
   else {
     getBody = "Connection to " + serverName +  " failed.";

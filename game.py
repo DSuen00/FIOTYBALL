@@ -1,5 +1,6 @@
 # import the pygame module, so you can use it
 import pygame
+from Comserver import setup_server, run_server
  
 # define a main function
 def main():
@@ -9,7 +10,8 @@ def main():
 
      
     # create a surface on screen that has the size of 240 x 180
-    screen = pygame.display.set_mode((1000,700))
+    res = (1280, 720)
+    screen = pygame.display.set_mode(res, pygame.RESIZABLE)
      
     # define a variable to control the main loop
     running = True
@@ -22,11 +24,11 @@ def main():
             if event.type == pygame.QUIT:
                 # change the value to False, to exit the main loop
                 running = False
-        try:
-            image = pygame.image.load("uploaded_image.jpg")
+        # try:
+            image = pygame.image.load("uploaded_image.jpg").convert()
             screen.blit(image, (50,50))
-        except:
-            pass
+        # except:
+        #     pass
         pygame.display.update()
      
      

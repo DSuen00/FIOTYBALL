@@ -2,15 +2,11 @@ from http.server import SimpleHTTPRequestHandler, HTTPServer
 import cgi
 import socket
 import os
-
+import pygame
 
 
 class webserverHandler(SimpleHTTPRequestHandler):
     """docstring for webserverHandler"""
-    buf = True
-    def __init__(self, *args, directory=None, **kwargs):
-        SimpleHTTPRequestHandler.__init__(self, *args, directory=None, **kwargs)
-        self.buf = True
 
     def do_GET(self):
         try:
@@ -55,14 +51,9 @@ class webserverHandler(SimpleHTTPRequestHandler):
                 # Extract the image data
             image_data = form_data
                 # Save the image data to a file
-            
-            # if self.buf:
-            #     file_name = "1.jpg"
-            # else:
-            #     file_name = "2.jpg"
             with open("uploaded_image.jpg", "wb") as image_file:
                 image_file.write(image_data)
-            # self.buf = not self.buf
+
         # Respond with a success message
         self.send_response(200)
 
@@ -78,17 +69,40 @@ def get_local_ip():
         s.close()
     return IP
  
-def setup_server():
+def main():
+    pygame.init()
 
-    try:
-        host = get_local_ip()
-        port = 8000
-        server = HTTPServer((host, port), webserverHandler)
-        print("Web server running on {}:{}".format(host, port))
+     
+    # create a surface on screen that has the size of 240 x 180
+    res = (1280, 720)
+    screen = pygame.display.set_mode(res, pygame.RESIZABLE)
+     
+    # define a variable to control the main loop
+    running = True
+    while running:
+        try:
+            
+            host = get_local_ip()
+            port = 8000
+            server = HTTPServer((host, port), webserverHandler)
+            print("Web server running on {}:{}".format(host, port))
+            server.serve_forever()
+        except KeyboardInterrupt:
+            print(" ^C entered stopping web server...")
+            server.socket.close()
+            running = False
+            for event in pygame.event.get():
+                # only do something if the event is of type QUIT
+                if event.type == pygame.QUIT:
+                    # change the value to False, to exit the main loop
+                    running = False
+        try:
+            image = pygame.image.load("uploaded_image.jpg").convert()
+            screen.blit(image, (50,50))
+        except:
+            pass
+        pygame.display.update()
+        pygame.time.tick
+        
 
-def run_server():    
-    try:
-        server.handle_request()
-    except KeyboardInterrupt:
-        print(" ^C entered stopping web server...")
-        server.socket.close()
+main()
