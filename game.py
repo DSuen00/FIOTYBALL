@@ -3,7 +3,7 @@ import pygame
 from Comserver import setup_server, run_server
  
 # define a main function
-def main():
+def setup():
      
     # initialize the pygame module
     pygame.init()
@@ -14,21 +14,16 @@ def main():
     screen = pygame.display.set_mode(res, pygame.RESIZABLE)
      
     # define a variable to control the main loop
-    running = True
-     
-    # main loop
-    while running:
+
+def main()
         # event handling, gets all event from the event queue
         for event in pygame.event.get():
             # only do something if the event is of type QUIT
             if event.type == pygame.QUIT:
                 # change the value to False, to exit the main loop
-                running = False
-        # try:
+                return False
             image = pygame.image.load("uploaded_image.jpg").convert()
             screen.blit(image, (50,50))
-        # except:
-        #     pass
         pygame.display.update()
      
      

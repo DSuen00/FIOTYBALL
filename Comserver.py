@@ -1,4 +1,5 @@
 from http.server import SimpleHTTPRequestHandler, HTTPServer
+from file_read import read_motor_data
 import cgi
 import socket
 import os
@@ -18,11 +19,9 @@ class webserverHandler(SimpleHTTPRequestHandler):
                 self.send_response(200)
                 self.send_header('Content-Type', 'data')
                 self.end_headers()
-
+                data = read_motor_data()
                 output = ""
-                output += '<html><body>Hello!'
-                output += '<form method="POST" enctype="multipart/form-data" action="/hello"><h2> What would you like me to say?</h2><input name="message" type="text" /><input type="submit" value="Submit" /></form>'
-                output += '</body></html>'
+                output += data
                 self.wfile.write(output.encode())
                 print(output)
                 return
@@ -50,19 +49,10 @@ class webserverHandler(SimpleHTTPRequestHandler):
         if content_type.startswith('multipart/form-data'):
             # Process the multipart data
             form_data = self.rfile.read(content_length)
-            # Split the form data into individual parts using the boundary
-            # if "image/jpeg" in form_data:
-                # Extract the image data
             image_data = form_data
-                # Save the image data to a file
-            
-            # if self.buf:
-            #     file_name = "1.jpg"
-            # else:
-            #     file_name = "2.jpg"
+            # Save the image data to a file
             with open("uploaded_image.jpg", "wb") as image_file:
                 image_file.write(image_data)
-            # self.buf = not self.buf
         # Respond with a success message
         self.send_response(200)
 
@@ -84,11 +74,25 @@ def setup_server():
         host = get_local_ip()
         port = 8000
         server = HTTPServer((host, port), webserverHandler)
+        server.timeout = 0.1
         print("Web server running on {}:{}".format(host, port))
+        return server
+    except:
+        pass
 
-def run_server():    
+def run_server(server):
     try:
+        # server.serve_forever()
         server.handle_request()
+        return True
     except KeyboardInterrupt:
         print(" ^C entered stopping web server...")
         server.socket.close()
+        return False
+
+server = setup_server()
+running = True
+while running:
+    running = run_server(server)
+
+# server.handle_request_noblock()

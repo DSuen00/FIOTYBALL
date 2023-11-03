@@ -20,7 +20,7 @@ const char* ssid = "Berkeley-IoT";
 const char* password = "0uW8&mx,"; //short cam
 
 
-String serverName = "10.40.66.202";   // REPLACE WITH YOUR Raspberry Pi IP ADDRESS
+String serverName = "10.40.67.88";   // REPLACE WITH YOUR Raspberry Pi IP ADDRESS
 //String serverName = "example.com";   // OR REPLACE WITH YOUR DOMAIN NAME
 
 String serverPath = "/hello";     // The default serverPath should be upload.php
