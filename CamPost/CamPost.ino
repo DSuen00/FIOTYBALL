@@ -21,9 +21,7 @@ const char* password = "0uW8&mx,"; //short cam
 
 
 String serverName = "10.40.67.88";   // REPLACE WITH YOUR Raspberry Pi IP ADDRESS
-//String serverName = "example.com";   // OR REPLACE WITH YOUR DOMAIN NAME
-
-String serverPath = "/hello";     // The default serverPath should be upload.php
+String serverPath = "/motor";     // The default serverPath should be upload.php
 
 const int serverPort = 8000;
 
@@ -48,7 +46,7 @@ WiFiClient client;
 #define HREF_GPIO_NUM     23
 #define PCLK_GPIO_NUM     22
 
-const int timerInterval = 30000;    // time between each HTTP POST image
+const int timerInterval = 1000;    // time between each HTTP POST image
 unsigned long previousMillis = 0;   // last time image was sent
 
 void setup() {

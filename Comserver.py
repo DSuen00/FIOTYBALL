@@ -19,7 +19,7 @@ class webserverHandler(SimpleHTTPRequestHandler):
                 self.send_response(200)
                 self.send_header('Content-Type', 'data')
                 self.end_headers()
-                data = read_motor_data()
+                data = read_motor_data("motor_data")
                 output = ""
                 output += data
                 self.wfile.write(output.encode())
@@ -94,5 +94,6 @@ server = setup_server()
 running = True
 while running:
     running = run_server(server)
+    print  
 
 # server.handle_request_noblock()
