@@ -14,8 +14,10 @@ def setup():
     screen = pygame.display.set_mode(res, pygame.RESIZABLE)
      
     # define a variable to control the main loop
+    background = pygame.image.load("background.jpg")
 
 def main()
+        screen.blit(background, (0,0))
         # event handling, gets all event from the event queue
         for event in pygame.event.get():
             # only do something if the event is of type QUIT
