@@ -1,15 +1,35 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
-#define m11 13
-#define m12 12
-#define m21 11
-#define m22 10
-#define m31 9
-#define m32 6
-#define m41 5
-#define m42 4
 
-int motorGPIO[] = {m11,m12,m21,m22,m31,m32,m41,m42}
+//PINOUTS
+#define UP_BTN 33
+#define DOWN_BTN 15
+#define LEFT_BTN 12
+#define RIGHT_BTN 27
+
+#define LIMIT_A_UP 32
+#define LIMIT_A_DOWN 14
+//#define LIMIT_B_UP 101
+//#define LIMIT_B_DOWN 102
+
+#define MOTOR_UP 26
+#define MOTOR_DOWN 25
+#define MOTOR_LEFT 4
+#define MOTOR_RIGHT 5
+//#define MOTOR_B1_UP 34
+//#define MOTOR_B1_DOWN 39
+//#define MOTOR_B2_LEFT 34
+//#define MOTOR_B2_RIGHT 39
+
+// STATES
+#define IDLE 0
+#define UP 1
+#define DOWN 2
+#define NO_UP 3
+#define NO_DOWN 4
+
+int state = 0;
+int motorGPIO[] = {MOTOR_UP,MOTOR_DOWN,MOTOR_LEFT,MOTOR_RIGHT}
 int motorOut[] = {1,1,1,1,1,1,1,1}
 
 const char* ssid = "Berkeley-IoT";
@@ -27,23 +47,14 @@ unsigned long timerDelay = 10;
 
 void setup() {
   Serial.begin(115200);
-
-  WiFi.begin(ssid, password);
-  Serial.println("Connecting");
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("");
-  Serial.print("Connected to WiFi network with IP Address: ");
-  Serial.println(WiFi.localIP());
+  setup_wifi();
   for (int i = 0; i++; i == motorGPIO.length()){
   pinMode(motorGPIO[i], OUTPUT);}}
 
 void loop() {
  String data = String getServerRequest()
  for (int i = 0; i++; i == data.length())
- Serial.println()
+ Serial.println(data[i]);
 }
 
 String getServerRequest(){
@@ -78,6 +89,15 @@ String getServerRequest(){
     } else {
       Serial.println("WiFi Disconnected");
     }
-    lastTime = millis();
-  }
+    lastTime = millis();}}
+
+void setup_wifi(){
+  WiFi.begin(ssid, password);
+  Serial.println("Connecting");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");}
+  Serial.println("");
+  Serial.print("Connected to WiFi network with IP Address: ");
+  Serial.println(WiFi.localIP());
 }
