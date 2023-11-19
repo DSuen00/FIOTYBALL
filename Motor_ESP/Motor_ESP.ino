@@ -19,10 +19,11 @@
 #define NO_UP 3
 #define NO_DOWN 4
 
-int state = 0;
+int lin_state = 0;
+int rot_state = 0;
 int motorGPIO[] = {MOTOR_UP,MOTOR_DOWN,MOTOR_LEFT,MOTOR_RIGHT};
 int motorOut[] = {1,1,1,1,1,1,1,1};
-String data = "";
+String data = "1111";
 
 const char* ssid = "Berkeley-IoT";
 // // const char* password = "0%$MB,(y";
@@ -43,9 +44,10 @@ void setup() {
 
 void loop() {
  data = getServerRequest();
- Serial.print(data[1]);
+ Serial.print(data[0]);Serial.print(data[1]);
  Serial.println(" ");
- state = linear_motor(state);
+ lin_state = linear_motor(lin_state);
+ rot_state = rot_motor(rot_state);
 }
 
 String getServerRequest(){
@@ -164,5 +166,42 @@ int linear_motor(int state){
       if (data[1] == '2') {
         digitalWrite(MOTOR_UP, HIGH);
         state = UP;}
+      break;}
+      return state;}
+
+int rot_motor(int state){
+   int motor = 0;
+   switch (state) {
+
+    case IDLE:
+
+      Serial.println("IDLE");
+      
+      if (data[motor] == '2') {
+        digitalWrite(MOTOR_LEFT, HIGH);
+        state = UP;}
+      
+      if (data[motor] == '0') {
+        digitalWrite(MOTOR_RIGHT, HIGH);
+        state = DOWN;}
+
+      break;
+    
+    case UP:
+
+      Serial.println("UP");
+      
+      if (data[motor] == '1') {
+        digitalWrite(MOTOR_LEFT, LOW);
+        state = IDLE;}
+      break;
+
+    case DOWN:
+
+      Serial.println("DOWN");
+      
+      if (data[motor] == '1') {
+        digitalWrite(MOTOR_RIGHT, LOW);
+        state = IDLE;}
       break;}
       return state;}
