@@ -22,16 +22,18 @@
 int lin_state = 0;
 int rot_state = 0;
 int motorGPIO[] = {MOTOR_UP,MOTOR_DOWN,MOTOR_LEFT,MOTOR_RIGHT};
-int motorOut[] = {1,1,1,1,1,1,1,1};
+bool goal_flag = false;
 String data = "1111";
+WiFiClient client;
 
 const char* ssid = "Berkeley-IoT";
 // // const char* password = "0%$MB,(y";
 const char* password = "yNxq)I&2";  //short cam
 
 //Your Domain name with URL path or IP address with path
-String serverName = "http://10.40.67.88:8000";
-String serverExt = "/motor";
+String serverName = "http://10.40.67.88";
+const int serverPort = 8000;
+String serverPath = "/motor";
 unsigned long lastTime = 0;
 // Set timer to 5 seconds (5000)
 unsigned long timerDelay = 10;
@@ -47,8 +49,7 @@ void loop() {
  Serial.print(data[0]);Serial.print(data[1]);
  Serial.println(" ");
  lin_state = linear_motor(lin_state);
- rot_state = rot_motor(rot_state);
-}
+ rot_state = rot_motor(rot_state);}
 
 String getServerRequest(){
   if ((millis() - lastTime) > timerDelay) {
@@ -56,7 +57,7 @@ String getServerRequest(){
     if (WiFi.status() == WL_CONNECTED) {
       HTTPClient http;
 
-      String serverPath = serverName + serverExt;
+      String serverPath = serverName + ":" + serverPort + serverPath;
 
       // Your Domain name with URL path or IP address with path
       http.begin(serverPath.c_str());
@@ -205,3 +206,29 @@ int rot_motor(int state){
         state = IDLE;}
       break;}
       return state;}
+
+bool goal_scored() {
+  Serial.println("Connecting to server: " + serverName);
+
+  if (client.connect(serverName.c_str(), serverPort)) {
+    Serial.println("Connection successful!");    
+
+  
+    client.println("POST " + serverPath + " HTTP/1.1");
+    client.println("Host: " + serverName);
+    client.println("Content-Length: 3");
+    client.println("Content-Type: goal");
+    client.println();
+    client.println("pla");
+
+    String response = "";
+    while (client.available()) {
+      char c = client.read();
+      response += c;}
+      Serial.print(response);
+    if (response == "200"){return true;}
+    else{return false;}}  
+  else {
+    String getBody = "Connection to " + serverName +  " failed.";
+    Serial.println(getBody);
+    return false;}}

@@ -51,21 +51,33 @@ class webserverHandler(SimpleHTTPRequestHandler):
             with open("uploaded_image.jpg", "wb") as image_file:
                 image_file.write(image_data)
 
+        elif content_type.startswith('trainingdata'):
+            # Process the multipart data
+            form_data = self.rfile.read(content_length)
+            image_data = form_data
+            self.send_response(200)
+            # Save the image data to a file
+            file_name = os.path.join("trainingData", read_motor_data("datacount") +".jpg")
+            with open(file_name, "wb") as image_file:
+                image_file.write(image_data)
+            file_name = int(read_motor_data("datacount")) + 1
+            write_motor_data("datacount", file_name)
+
         elif content_type.startswith('goal'):
             form_data = self.rfile.read(content_length)
             goal_data = read_motor_data("goals")
             goal_data = goal_data.rsplit(":")
             for x in range(len(goal_data)):
                 goal_data[x] = int(goal_data[x])
-            if form_data == "player":
+            if form_data == "pla":
                 goal_data[0] +=1
-            elif form_data == "opponent":
+            elif form_data == "opp":
                 goal_data[1]+=1
             else:
                 self.send_response(100)
                 return
             goal_data = str(goal_data[0]) + ":" + str(goal_data[1])
-            write_motor_data(goal_data)
+            write_motor_data("goals",goal_data)
             self.send_response(200)
 
 
@@ -106,7 +118,10 @@ def run_server(server):
         server.socket.close()
         return False
 
-# server = setup_server()
+server = setup_server()
+
+while True:
+    run_server(server)
 
 
 # server.handle_request_noblock()
