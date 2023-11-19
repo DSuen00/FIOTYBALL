@@ -8,10 +8,6 @@ import os
 
 class webserverHandler(SimpleHTTPRequestHandler):
     """docstring for webserverHandler"""
-    buf = True
-    def __init__(self, *args, directory=None, **kwargs):
-        SimpleHTTPRequestHandler.__init__(self, *args, directory=None, **kwargs)
-        self.buf = True
 
     def do_GET(self):
         try:
@@ -90,7 +86,7 @@ def run_server(server):
         server.socket.close()
         return False
 
-server = setup_server()
+# server = setup_server()
 
 
 # server.handle_request_noblock()

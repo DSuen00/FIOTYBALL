@@ -2,10 +2,8 @@
 import pygame
 from file_read import write_motor_data
 import sys
-# from Comserver import setup_server, run_server
-motorstring = [1,1,1,1]
 # define a main function
-def setup():
+def game_setup():
      
     # initialize the pygame module
     pygame.init()
@@ -20,7 +18,7 @@ def setup():
     pygame.display.update()
     return screen
 
-def main(screen):
+def game_main(screen, motorstring):
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -72,10 +70,3 @@ def main(screen):
     screen.blit(image, (50,50))
 
     pygame.display.update()
-     
-screen = setup()     
-# run the main function only if this module is executed as the main script
-# (if you import this as a module then nothing is executed)
-while __name__=="__main__":
-# call the main function
-    main(screen)

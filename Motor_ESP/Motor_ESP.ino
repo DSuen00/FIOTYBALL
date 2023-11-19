@@ -29,8 +29,8 @@
 #define NO_DOWN 4
 
 int state = 0;
-int motorGPIO[] = {MOTOR_UP,MOTOR_DOWN,MOTOR_LEFT,MOTOR_RIGHT}
-int motorOut[] = {1,1,1,1,1,1,1,1}
+int motorGPIO[] = {MOTOR_UP,MOTOR_DOWN,MOTOR_LEFT,MOTOR_RIGHT};
+int motorOut[] = {1,1,1,1,1,1,1,1};
 
 const char* ssid = "Berkeley-IoT";
 // // const char* password = "0%$MB,(y";
@@ -48,12 +48,12 @@ unsigned long timerDelay = 10;
 void setup() {
   Serial.begin(115200);
   setup_wifi();
-  for (int i = 0; i++; i == motorGPIO.length()){
+  for (int i = 0; i++; i == sizeof(motorGPIO) / sizeof(motorGPIO[0])){
   pinMode(motorGPIO[i], OUTPUT);}}
 
 void loop() {
- String data = String getServerRequest()
- for (int i = 0; i++; i == data.length())
+ String data = getServerRequest();
+ for (int i = 0; i++; i == sizeof(data) / sizeof(data[0]))
  Serial.println(data[i]);
 }
 
@@ -73,11 +73,11 @@ String getServerRequest(){
 
       // Send HTTP GET request
       int httpResponseCode = http.GET();
-
+      String payload = "";
       if (httpResponseCode > 0) {
         Serial.print("HTTP Response code: ");
         Serial.println(httpResponseCode);
-        String payload = http.getString();
+        payload = http.getString();
         Serial.println(payload);
       } else {
         // Serial.print("Error code: ");
@@ -85,7 +85,7 @@ String getServerRequest(){
       }
       // Free resources
       http.end();
-      return payload
+      return payload;
     } else {
       Serial.println("WiFi Disconnected");
     }
