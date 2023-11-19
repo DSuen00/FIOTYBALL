@@ -6,6 +6,7 @@ import sys
 def game_setup():
      
     # initialize the pygame module
+    write_motor_data("goals", "0:0")
     pygame.init()
     # create a surface on screen that has the size of 240 x 180
     res = (1280, 720)
