@@ -91,9 +91,6 @@ def run_server(server):
         return False
 
 server = setup_server()
-running = True
-while running:
-    running = run_server(server)
-    print  
+
 
 # server.handle_request_noblock()
