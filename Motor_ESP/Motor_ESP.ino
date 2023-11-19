@@ -22,6 +22,7 @@
 int state = 0;
 int motorGPIO[] = {MOTOR_UP,MOTOR_DOWN,MOTOR_LEFT,MOTOR_RIGHT};
 int motorOut[] = {1,1,1,1,1,1,1,1};
+String data = "";
 
 const char* ssid = "Berkeley-IoT";
 // // const char* password = "0%$MB,(y";
@@ -41,11 +42,10 @@ void setup() {
   pinMode(motorGPIO[i], OUTPUT);}}
 
 void loop() {
- String data = getServerRequest();
- for (int i = 0; i++; i == sizeof(data) / sizeof(data[0])){
- Serial.print(data[i]);}
+ data = getServerRequest();
+ Serial.print(data[1]);
  Serial.println(" ");
- linear_motor(state);
+ state = linear_motor(state);
 }
 
 String getServerRequest(){
@@ -69,7 +69,7 @@ String getServerRequest(){
         Serial.print("HTTP Response code: ");
         Serial.println(httpResponseCode);
         payload = http.getString();
-        Serial.println(payload);
+        // Serial.println(payload);
       } else {
         // Serial.print("Error code: ");
         // Serial.println(httpResponseCode);
@@ -92,18 +92,18 @@ void setup_wifi(){
   Serial.print("Connected to WiFi network with IP Address: ");
   Serial.println(WiFi.localIP());}
 
-void linear_motor(int state){
+int linear_motor(int state){
    switch (state) {
 
     case IDLE:
 
       Serial.println("IDLE");
       
-      if (data[1] == 2) {
+      if (data[1] == '2') {
         digitalWrite(MOTOR_UP, HIGH);
         state = UP;}
       
-      if (data[1] == 0) {
+      if (data[1] == '0') {
         digitalWrite(MOTOR_DOWN, HIGH);
         state = DOWN;
       }
@@ -120,7 +120,7 @@ void linear_motor(int state){
 
       Serial.println("UP");
       
-      if (data[1] == 1) {
+      if (data[1] == '1') {
         digitalWrite(MOTOR_UP, LOW);
         state = IDLE;}
       
@@ -133,7 +133,7 @@ void linear_motor(int state){
 
       Serial.println("DOWN");
       
-      if (data[1] == 1) {
+      if (data[1] == '1') {
         digitalWrite(MOTOR_DOWN, LOW);
         state = IDLE;}
       
@@ -149,7 +149,7 @@ void linear_motor(int state){
       if (digitalRead(LIMIT_UP) == LOW) {
         state = IDLE;}
 
-      if (data[1] == 0) {
+      if (data[1] == '0') {
         digitalWrite(MOTOR_DOWN, HIGH);
         state = DOWN;}
       break;
@@ -161,7 +161,8 @@ void linear_motor(int state){
       if (digitalRead(LIMIT_DOWN) == LOW) {
         state = IDLE;}
 
-      if (data[1] == 2) {
+      if (data[1] == '2') {
         digitalWrite(MOTOR_UP, HIGH);
         state = UP;}
-      break;}}
+      break;}
+      return state;}
