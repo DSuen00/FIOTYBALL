@@ -2,24 +2,15 @@
 #include <HTTPClient.h>
 
 //PINOUTS
-#define UP_BTN 33
-#define DOWN_BTN 15
-#define LEFT_BTN 12
-#define RIGHT_BTN 27
 
-#define LIMIT_A_UP 32
-#define LIMIT_A_DOWN 14
-//#define LIMIT_B_UP 101
-//#define LIMIT_B_DOWN 102
+#define LIMIT_UP 32
+#define LIMIT_DOWN 14
 
 #define MOTOR_UP 26
 #define MOTOR_DOWN 25
 #define MOTOR_LEFT 4
 #define MOTOR_RIGHT 5
-//#define MOTOR_B1_UP 34
-//#define MOTOR_B1_DOWN 39
-//#define MOTOR_B2_LEFT 34
-//#define MOTOR_B2_RIGHT 39
+
 
 // STATES
 #define IDLE 0
@@ -39,8 +30,6 @@ const char* password = "yNxq)I&2";  //short cam
 //Your Domain name with URL path or IP address with path
 String serverName = "http://10.40.67.88:8000";
 String serverExt = "/motor";
-// the following variables are unsigned longs because the time, measured in
-// milliseconds, will quickly become a bigger number than can be stored in an int.
 unsigned long lastTime = 0;
 // Set timer to 5 seconds (5000)
 unsigned long timerDelay = 10;
@@ -53,8 +42,10 @@ void setup() {
 
 void loop() {
  String data = getServerRequest();
- for (int i = 0; i++; i == sizeof(data) / sizeof(data[0]))
- Serial.println(data[i]);
+ for (int i = 0; i++; i == sizeof(data) / sizeof(data[0])){
+ Serial.print(data[i]);}
+ Serial.println(" ");
+ linear_motor(state);
 }
 
 String getServerRequest(){
@@ -99,5 +90,78 @@ void setup_wifi(){
     Serial.print(".");}
   Serial.println("");
   Serial.print("Connected to WiFi network with IP Address: ");
-  Serial.println(WiFi.localIP());
-}
+  Serial.println(WiFi.localIP());}
+
+void linear_motor(int state){
+   switch (state) {
+
+    case IDLE:
+
+      Serial.println("IDLE");
+      
+      if (data[1] == 2) {
+        digitalWrite(MOTOR_UP, HIGH);
+        state = UP;}
+      
+      if (data[1] == 0) {
+        digitalWrite(MOTOR_DOWN, HIGH);
+        state = DOWN;
+      }
+      
+      if (digitalRead(LIMIT_UP) == HIGH) {
+        state = NO_UP;}
+
+      if (digitalRead(LIMIT_DOWN) == HIGH) {
+        state = NO_DOWN;}
+
+      break;
+    
+    case UP:
+
+      Serial.println("UP");
+      
+      if (data[1] == 1) {
+        digitalWrite(MOTOR_UP, LOW);
+        state = IDLE;}
+      
+      if (digitalRead(LIMIT_UP) == HIGH) {
+        digitalWrite(MOTOR_UP, LOW);
+        state = NO_UP;}
+      break;
+
+    case DOWN:
+
+      Serial.println("DOWN");
+      
+      if (data[1] == 1) {
+        digitalWrite(MOTOR_DOWN, LOW);
+        state = IDLE;}
+      
+      if (digitalRead(LIMIT_DOWN) == HIGH) {
+        digitalWrite(MOTOR_DOWN, LOW);
+        state = NO_DOWN;}
+      break;
+
+    case NO_UP:
+
+      Serial.println("NO_UP");
+      
+      if (digitalRead(LIMIT_UP) == LOW) {
+        state = IDLE;}
+
+      if (data[1] == 0) {
+        digitalWrite(MOTOR_DOWN, HIGH);
+        state = DOWN;}
+      break;
+    
+    case NO_DOWN:
+
+      Serial.println("NO_DOWN");
+      
+      if (digitalRead(LIMIT_DOWN) == LOW) {
+        state = IDLE;}
+
+      if (data[1] == 2) {
+        digitalWrite(MOTOR_UP, HIGH);
+        state = UP;}
+      break;}}
