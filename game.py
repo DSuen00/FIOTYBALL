@@ -65,8 +65,10 @@ def game_main(screen, motorstring):
         # convert motorstring to a string
     motor_save = "".join(str(x) for x in motorstring)
     write_motor_data("motor_data",motor_save)
-    print(motor_save)
-    image = pygame.image.load("uploaded_image.jpg").convert()
-    screen.blit(image, (50,50))
+    try:
+        image = pygame.image.load("uploaded_image.jpg").convert()
+        screen.blit(image, (50,50))
+    except:
+        pass
 
     pygame.display.update()

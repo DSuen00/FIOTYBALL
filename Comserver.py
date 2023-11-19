@@ -1,4 +1,4 @@
-from http.server import SimpleHTTPRequestHandler, HTTPServer
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from file_read import read_motor_data
 import cgi
 import socket
@@ -69,8 +69,8 @@ def setup_server():
     try:
         host = get_local_ip()
         port = 8000
-        server = HTTPServer((host, port), webserverHandler)
-        server.timeout = 0.1
+        server = ThreadingHTTPServer((host, port), webserverHandler)
+        server.timeout = 0.3
         print("Web server running on {}:{}".format(host, port))
         return server
     except:

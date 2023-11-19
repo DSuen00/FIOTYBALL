@@ -9,4 +9,4 @@ running = True
 
 while running:
     run_server(server)
-    # game_main(screen, motor_data)
+    game_main(screen, motor_data)
