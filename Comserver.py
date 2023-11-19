@@ -1,5 +1,5 @@
-from http.server import SimpleHTTPRequestHandler, HTTPServer
-from file_read import read_motor_data
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+from file_read import read_motor_data, write_motor_data
 import cgi
 import socket
 import os
@@ -8,10 +8,6 @@ import os
 
 class webserverHandler(SimpleHTTPRequestHandler):
     """docstring for webserverHandler"""
-    buf = True
-    def __init__(self, *args, directory=None, **kwargs):
-        SimpleHTTPRequestHandler.__init__(self, *args, directory=None, **kwargs)
-        self.buf = True
 
     def do_GET(self):
         try:
@@ -50,11 +46,31 @@ class webserverHandler(SimpleHTTPRequestHandler):
             # Process the multipart data
             form_data = self.rfile.read(content_length)
             image_data = form_data
+            self.send_response(200)
             # Save the image data to a file
             with open("uploaded_image.jpg", "wb") as image_file:
                 image_file.write(image_data)
+
+        elif content_type.startswith('goal'):
+            form_data = self.rfile.read(content_length)
+            goal_data = read_motor_data("goals")
+            goal_data = goal_data.rsplit(":")
+            for x in range(len(goal_data)):
+                goal_data[x] = int(goal_data[x])
+            if form_data == "player":
+                goal_data[0] +=1
+            elif form_data == "opponent":
+                goal_data[1]+=1
+            else:
+                self.send_response(100)
+                return
+            goal_data = str(goal_data[0]) + ":" + str(goal_data[1])
+            write_motor_data(goal_data)
+            self.send_response(200)
+
+
         # Respond with a success message
-        self.send_response(200)
+        
 
 def get_local_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -73,8 +89,8 @@ def setup_server():
     try:
         host = get_local_ip()
         port = 8000
-        server = HTTPServer((host, port), webserverHandler)
-        server.timeout = 0.1
+        server = ThreadingHTTPServer((host, port), webserverHandler)
+        server.timeout = 0.3
         print("Web server running on {}:{}".format(host, port))
         return server
     except:
@@ -90,10 +106,7 @@ def run_server(server):
         server.socket.close()
         return False
 
-server = setup_server()
-running = True
-while running:
-    running = run_server(server)
-    print  
+# server = setup_server()
+
 
 # server.handle_request_noblock()

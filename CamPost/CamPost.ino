@@ -46,7 +46,7 @@ WiFiClient client;
 #define HREF_GPIO_NUM     23
 #define PCLK_GPIO_NUM     22
 
-const int timerInterval = 1000;    // time between each HTTP POST image
+const int timerInterval = 1;    // time between each HTTP POST image
 unsigned long previousMillis = 0;   // last time image was sent
 
 void setup() {
