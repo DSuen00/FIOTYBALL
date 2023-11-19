@@ -1,13 +1,13 @@
 // DEFINE -----------------------------------------------
   // PINOUTS
 
-#define UP_BTN 33
-#define DOWN_BTN 15
-#define LEFT_BTN 12
-#define RIGHT_BTN 27
+#define UP_BTN 32
+#define DOWN_BTN 14
+#define LEFT_BTN 33
+#define RIGHT_BTN 15
 
-#define LIMIT_A_UP 32
-#define LIMIT_A_DOWN 14
+#define LIMIT_A_UP 12
+#define LIMIT_A_DOWN 27
 //#define LIMIT_B_UP 101
 //#define LIMIT_B_DOWN 102
 
