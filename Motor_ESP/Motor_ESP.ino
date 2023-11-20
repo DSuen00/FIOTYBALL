@@ -3,8 +3,8 @@
 
 //PINOUTS
 
-#define LIMIT_UP 32
-#define LIMIT_DOWN 14
+#define LIMIT_UP 27
+#define LIMIT_DOWN 12
 
 #define MOTOR_UP 26
 #define MOTOR_DOWN 25
@@ -21,7 +21,7 @@
 
 int lin_state = 0;
 int rot_state = 0;
-int motorGPIO[] = {MOTOR_UP,MOTOR_DOWN,MOTOR_LEFT,MOTOR_RIGHT};
+int motorGPIO[4] = {MOTOR_UP,MOTOR_DOWN,MOTOR_LEFT,MOTOR_RIGHT};
 bool goal_flag = false;
 String data = "1111";
 WiFiClient client;
@@ -42,7 +42,11 @@ void setup() {
   Serial.begin(115200);
   setup_wifi();
   for (int i = 0; i++; i == sizeof(motorGPIO) / sizeof(motorGPIO[0])){
-  pinMode(motorGPIO[i], OUTPUT);}}
+  pinMode(motorGPIO[i], OUTPUT);}
+  pinMode(MOTOR_UP, OUTPUT);
+  pinMode(MOTOR_DOWN, OUTPUT);
+  pinMode(MOTOR_LEFT, OUTPUT);
+  pinMode(MOTOR_RIGHT, OUTPUT);}
 
 void loop() {
  data = getServerRequest();
@@ -57,10 +61,10 @@ String getServerRequest(){
     if (WiFi.status() == WL_CONNECTED) {
       HTTPClient http;
 
-      String serverPath = serverName + ":" + serverPort + serverPath;
-
+      String serverpath = serverName + ":" + String(serverPort) + serverPath;
+      Serial.println(serverpath);
       // Your Domain name with URL path or IP address with path
-      http.begin(serverPath.c_str());
+      http.begin(serverpath.c_str());
 
       // If you need Node-RED/server authentication, insert user and password below
       //http.setAuthorization("REPLACE_WITH_SERVER_USERNAME", "REPLACE_WITH_SERVER_PASSWORD");
@@ -74,8 +78,8 @@ String getServerRequest(){
         payload = http.getString();
         // Serial.println(payload);
       } else {
-        // Serial.print("Error code: ");
-        // Serial.println(httpResponseCode);
+        Serial.print("Error code: ");
+        Serial.println(httpResponseCode);
       }
       // Free resources
       http.end();
@@ -207,28 +211,28 @@ int rot_motor(int state){
       break;}
       return state;}
 
-bool goal_scored() {
-  Serial.println("Connecting to server: " + serverName);
+// bool goal_scored() {
+//   Serial.println("Connecting to server: " + serverName);
 
-  if (client.connect(serverName.c_str(), serverPort)) {
-    Serial.println("Connection successful!");    
+//   if (client.connect(serverName.c_str(), serverPort)) {
+//     Serial.println("Connection successful!");    
 
   
-    client.println("POST " + serverPath + " HTTP/1.1");
-    client.println("Host: " + serverName);
-    client.println("Content-Length: 3");
-    client.println("Content-Type: goal");
-    client.println();
-    client.println("pla");
+//     client.println("POST " + serverPath + " HTTP/1.1");
+//     client.println("Host: " + serverName);
+//     client.println("Content-Length: 3");
+//     client.println("Content-Type: goal");
+//     client.println();
+//     client.println("pla");
 
-    String response = "";
-    while (client.available()) {
-      char c = client.read();
-      response += c;}
-      Serial.print(response);
-    if (response == "200"){return true;}
-    else{return false;}}  
-  else {
-    String getBody = "Connection to " + serverName +  " failed.";
-    Serial.println(getBody);
-    return false;}}
+//     String response = "";
+//     while (client.available()) {
+//       char c = client.read();
+//       response += c;}
+//       Serial.print(response);
+//     if (response == "200"){return true;}
+//     else{return false;}}  
+//   else {
+//     String getBody = "Connection to " + serverName +  " failed.";
+//     Serial.println(getBody);
+//     return false;}}

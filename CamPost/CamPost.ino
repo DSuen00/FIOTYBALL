@@ -16,8 +16,8 @@
 #include "esp_camera.h"
 
 const char* ssid = "Berkeley-IoT";
-// // const char* password = "0%$MB,(y";
-const char* password = "0uW8&mx,"; //short cam
+const char* password = "0%$MB,(y";
+// const char* password = "0uW8&mx,"; //short cam
 
 
 String serverName = "10.40.67.88";   // REPLACE WITH YOUR Raspberry Pi IP ADDRESS
