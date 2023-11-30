@@ -73,3 +73,32 @@ def game_main(screen, motorstring):
         pass
 
     pygame.display.update()
+
+def scoreboard():
+     pygame.font.init()
+
+     RED = (255,0,0)
+     YELLOW = (255,255,0)
+     WHITE = (255,255,255)
+
+     SCORE_FONT = pygame.font.SysFont('comicsans',40)
+
+     RED_GOAL = pygame.USEREVENT + 1
+     YELLOW_GOAL = pygame.USEREVENT + 2
+
+     red_rawscore = 0
+     yellow_rawscore = 0
+
+     red_scoreboard = SCORE_FONT.render(str(red_rawscore), 1, WHITE)
+     yellow_scoreboard = SCORE_FONT.render(str(yellow_rawscore), 1, WHITE)
+
+     RED_BOX = pygame.Rect(800,400,50,50)
+     YELLOW_BOX = pygame.Rect(860,400,50,50)
+     pygame.draw.rect(screen, RED, RED_BOX)
+     pygame.draw.rect(screen, YELLOW, YELLOW_BOX)
+     
+     screen.blit(red_scoreboard, (800, 400))
+     screen.blit(yellow_scoreboard, (860, 400))
+
+     pygame.display.update()
+     
