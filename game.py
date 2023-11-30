@@ -62,7 +62,12 @@ def game_main(screen, motorstring):
                 motorstring[1] = 1
             elif event.key == pygame.K_s:
                 motorstring[1] = 1
-        
+
+       elif event.type == RED_GOAL:
+           red_rawscore += 1
+       elif event.type == YELLOW_GOAL:
+           yellow_rawscore += 1
+     
         # convert motorstring to a string
     motor_save = "".join(str(x) for x in motorstring)
     write_motor_data("motor_data",motor_save)
