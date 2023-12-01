@@ -33,12 +33,12 @@ def game_setup():
 
     # define a variable to control the main loop
 
-    scoreboard(screen)
+    scoreboard(screen, [0,0])
     pygame.key.set_repeat()
     pygame.display.update()
     return screen
 
-def game_main(screen, motorstring):
+def game_main(screen, motorstring, score_arr):
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -85,7 +85,7 @@ def game_main(screen, motorstring):
         # convert motorstring to a string
     motor_save = "".join(str(x) for x in motorstring)
     write_motor_data("motor_data",motor_save)
-    scoreboard(screen)
+    scoreboard(screen, score_arr)
     try:
         image = pygame.image.load("uploaded_image.jpg").convert()
         image = pygame.Surface.convert(image)
@@ -102,21 +102,21 @@ def getscore():
     return goals_arr
 
 
-def scoreboard(screen):
+def scoreboard(screen, score_arr):
     SCORE_FONT = pygame.font.SysFont('comicsans',70)
 
     RED = (200,50,0)
     YELLOW = (255,200,0)
     WHITE = (255,255,255)
 
+    old_score = score_arr
     score_arr = getscore()
+    top = 363 
 
-    if score_arr[0] != yellow_rawscore:
-        top = 363 
+    if score_arr[0] != old_score[0]:
         YELLOW_BOX = pygame.Rect(860,top,110,150)
         pygame.draw.rect(screen, YELLOW, YELLOW_BOX)
-    if score_arr[1] != red_rawscore:
-        top = 363
+    if score_arr[1] != old_score[1]:
         RED_BOX = pygame.Rect(1047,top,110,150)
         pygame.draw.rect(screen, RED, RED_BOX)
      
