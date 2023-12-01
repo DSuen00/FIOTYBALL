@@ -3,16 +3,14 @@
 
 //PINOUTS
 
-#define LIMIT_UP 27
-#define LIMIT_DOWN 12
+#define LIMIT_UP_G 27
+#define LIMIT_DOWN_G 12
 
-#define MOTOR_UP 25
-#define MOTOR_DOWN 26
-#define MOTOR_LEFT 4
-#define MOTOR_RIGHT 5
+#define MOTOR_UP_G 25
+#define MOTOR_DOWN_G 26
+#define MOTOR_LEFT_G 4
+#define MOTOR_RIGHT_G 5
 
-# define trigPin 19
-# define echoPin 21
 
 // STATES
 #define IDLE 0
@@ -21,10 +19,8 @@
 #define NO_UP 3
 #define NO_DOWN 4
 
-int lin_state = 0;
-int rot_state = 0;
-int motorGPIO[4] = {MOTOR_UP,MOTOR_DOWN,MOTOR_LEFT,MOTOR_RIGHT};
-bool goal_flag = false;
+int lin_state_G = 0;
+int rot_state_G = 0;
 String data = "1111";
 WiFiClient client;
 
@@ -40,46 +36,19 @@ unsigned long lastTime = 0;
 // Set timer to 5 seconds (5000)
 unsigned long timerDelay = 10;
 
-//define sound speed in 10m/uS
-const int SOUND_SPEED = 34;
-
-long duration;
-int distance;
-
-int score = 0;
-int count = 0;
-volatile bool new_game = false;
-
-const int distance_reset_min = 5000;
-const int distance_reset_max = 11000;
-
-
-unsigned long previousTime = 0;
-
 void setup() {
   Serial.begin(115200);
   setup_wifi();
-  for (int i = 0; i++; i == sizeof(motorGPIO) / sizeof(motorGPIO[0])){
-  pinMode(motorGPIO[i], OUTPUT);}
-  pinMode(MOTOR_UP, OUTPUT); pinMode(MOTOR_DOWN, OUTPUT);
-  pinMode(MOTOR_LEFT, OUTPUT); pinMode(MOTOR_RIGHT, OUTPUT);
-  pinMode(trigPin, OUTPUT); pinMode(echoPin, INPUT);}
+  pinMode(MOTOR_UP_G, OUTPUT); pinMode(MOTOR_DOWN_G, OUTPUT);
+  pinMode(MOTOR_LEFT_G, OUTPUT); pinMode(MOTOR_RIGHT_G, OUTPUT);
+  pinMode(LIMIT_UP_G, INPUT_PULLUP); pinMode(LIMIT_DOWN_G, INPUT_PULLUP);}
 
 void loop() {
- unsigned long currentTime = micros();
-  if (currentTime - previousTime < 120) {
-    digitalWrite(trigPin, HIGH);
-//    Serial.print(1);
-  } else if (currentTime - previousTime < 160) {
-    digitalWrite(trigPin, LOW);
-    scoretracker();
-  } else {
-    previousTime = currentTime;}
-//  data = getServerRequest();
-// //  Serial.print(data[0]);Serial.print(data[1]);
-// //  Serial.println(" ");
-//  lin_state = linear_motor(lin_state);
-//  rot_state = rot_motor(rot_state);
+ data = getServerRequest();
+ Serial.print(data[0]);Serial.print(data[1]);
+ Serial.println(" ");
+ lin_state_g = linear_motor(lin_state);
+ rot_state = rot_motor(rot_state);
  }
 
 String getServerRequest(){
@@ -134,18 +103,18 @@ int linear_motor(int state){
       // Serial.println("IDLE");
       
       if (data[1] == '0') {
-        digitalWrite(MOTOR_UP, HIGH);
+        digitalWrite(MOTOR_UP_G, HIGH);
         state = UP;}
       
       if (data[1] == '2') {
-        digitalWrite(MOTOR_DOWN, HIGH);
+        digitalWrite(MOTOR_DOWN_G, HIGH);
         state = DOWN;
       }
       
-      if (digitalRead(LIMIT_UP) == HIGH) {
+      if (digitalRead(LIMIT_UP_G) == HIGH) {
         state = NO_UP;}
 
-      if (digitalRead(LIMIT_DOWN) == HIGH) {
+      if (digitalRead(LIMIT_DOWN_G) == HIGH) {
         state = NO_DOWN;}
 
       break;
@@ -155,11 +124,11 @@ int linear_motor(int state){
       Serial.println("UP");
       
       if (data[1] == '1') {
-        digitalWrite(MOTOR_UP, LOW);
+        digitalWrite(MOTOR_UP_G, LOW);
         state = IDLE;}
       
-      if (digitalRead(LIMIT_UP) == HIGH) {
-        digitalWrite(MOTOR_UP, LOW);
+      if (digitalRead(LIMIT_UP_G) == HIGH) {
+        digitalWrite(MOTOR_UP_G, LOW);
         state = NO_UP;}
       break;
 
@@ -168,11 +137,11 @@ int linear_motor(int state){
       Serial.println("DOWN");
       
       if (data[1] == '1') {
-        digitalWrite(MOTOR_DOWN, LOW);
+        digitalWrite(MOTOR_DOWN_G, LOW);
         state = IDLE;}
       
-      if (digitalRead(LIMIT_DOWN) == HIGH) {
-        digitalWrite(MOTOR_DOWN, LOW);
+      if (digitalRead(LIMIT_DOWN_G) == HIGH) {
+        digitalWrite(MOTOR_DOWN_G, LOW);
         state = NO_DOWN;}
       break;
 
@@ -180,11 +149,11 @@ int linear_motor(int state){
 
       Serial.println("NO_UP");
       
-      if (digitalRead(LIMIT_UP) == LOW) {
+      if (digitalRead(LIMIT_UP_G) == LOW) {
         state = IDLE;}
 
       if (data[1] == '2') {
-        digitalWrite(MOTOR_DOWN, HIGH);
+        digitalWrite(MOTOR_DOWN_G, HIGH);
         state = DOWN;}
       break;
     
@@ -196,7 +165,7 @@ int linear_motor(int state){
         state = IDLE;}
 
       if (data[1] == '0') {
-        digitalWrite(MOTOR_UP, HIGH);
+        digitalWrite(MOTOR_UP_G, HIGH);
         state = UP;}
       break;}
       return state;}
@@ -210,11 +179,11 @@ int rot_motor(int state){
       Serial.println("IDLE");
       
       if (data[motor] == '2') {
-        digitalWrite(MOTOR_LEFT, HIGH);
+        digitalWrite(MOTOR_LEFT_G, HIGH);
         state = UP;}
       
       if (data[motor] == '0') {
-        digitalWrite(MOTOR_RIGHT, HIGH);
+        digitalWrite(MOTOR_RIGHT_G, HIGH);
         state = DOWN;}
 
       break;
@@ -224,7 +193,7 @@ int rot_motor(int state){
       Serial.println("UP");
       
       if (data[motor] == '1') {
-        digitalWrite(MOTOR_LEFT, LOW);
+        digitalWrite(MOTOR_LEFT_G, LOW);
         state = IDLE;}
       break;
 
@@ -233,73 +202,7 @@ int rot_motor(int state){
       Serial.println("DOWN");
       
       if (data[motor] == '1') {
-        digitalWrite(MOTOR_RIGHT, LOW);
+        digitalWrite(MOTOR_RIGHT_G, LOW);
         state = IDLE;}
       break;}
       return state;}
-
-void scoretracker() {
-  duration = pulseIn(echoPin, HIGH);
-  distance = duration * SOUND_SPEED/2;
-  
-  if (!new_game) {
-    if (distance > distance_reset_min && distance < distance_reset_max) {
-      count += 1;
-      if (count == 1000) { count = 0; new_game = true; }
-    } else {
-      count = 0;
-      }
-  }
-
-  if (new_game) {
-    if (distance <= distance_reset_min || distance >= distance_reset_max) {
-      count += 1;
-      if (count == 100) 
-      {count = 0; score += 1; new_game = false;
-      bool sent = false;
-      while (!sent){
-      sent = sentGoal(true);} }
-    } else {
-      count = 0;
-      }
-  }
-
-  // Prints the distance in the Serial Monitor
-  Serial.print("Distance : ");
-  Serial.print(distance);
-  Serial.print("   Score : ");
-  Serial.println(score);
-}
-
-bool sentGoal(bool player){
-    bool ret = false;
-    if (WiFi.status() == WL_CONNECTED) {
-      HTTPClient http;
-      String path = "";
-      if (player == true){
-        path = "/pla";
-      } else {path = "/opp";}
-      String serverpath = serverName + ":" + String(serverPort) + path;
-      Serial.println(serverpath);
-      // Your Domain name with URL path or IP address with path
-      http.begin(serverpath.c_str());
-
-      // If you need Node-RED/server authentication, insert user and password below
-      //http.setAuthorization("REPLACE_WITH_SERVER_USERNAME", "REPLACE_WITH_SERVER_PASSWORD");
-
-      // Send HTTP GET request
-      int httpResponseCode = http.GET();
-      Serial.println(httpResponseCode);
-      String payload = "";
-      if (httpResponseCode == 200) {
-        ret = true;
-      } else {
-        ret = false;}
-      // Free resources
-      http.end();
-    } else {
-      // Serial.println("WiFi Disconnected")
-      ret = false;
-    }
-    lastTime = millis();
-    return ret;}
