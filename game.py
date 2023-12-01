@@ -81,11 +81,6 @@ def game_main(screen, motorstring):
                 motorstring[1] = 1
             elif event.key == pygame.K_s:
                 motorstring[1] = 1
-
-    #    elif event.type == RED_GOAL:
-    #        red_rawscore += 1
-    #    elif event.type == YELLOW_GOAL:
-    #        yellow_rawscore += 1
      
         # convert motorstring to a string
     motor_save = "".join(str(x) for x in motorstring)
@@ -110,16 +105,17 @@ def getscore():
 def scoreboard(screen):
     SCORE_FONT = pygame.font.SysFont('comicsans',70)
 
-    #  RED_GOAL = pygame.USEREVENT + 1
-    #  YELLOW_GOAL = pygame.USEREVENT + 2
-
-    #  red_rawscore = 0
-    #  yellow_rawscore = 0
     RED = (200,50,0)
     YELLOW = (255,200,0)
     WHITE = (255,255,255)
 
     score_arr = getscore()
+
+     if score_arr[0] != yellow_rawscore:
+          pygame.draw.rect(screen, YELLOW, YELLOW_BOX)
+     if score_arr[1] != red_rawscore:
+          pygame.draw.rect(screen, RED, RED_BOX)
+     
     yellow_rawscore = score_arr[0]
     red_rawscore = score_arr[1]
 
