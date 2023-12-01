@@ -1,20 +1,39 @@
 # import the pygame module, so you can use it
 import pygame
-from file_read import write_motor_data
+from file_read import write_motor_data, read_motor_data
 import sys
+
+motor_data = [1,1,1,1]
+
 # define a main function
 def game_setup():
      
     # initialize the pygame module
     write_motor_data("goals", "0:0")
     pygame.init()
+    pygame.font.init()
+
     # create a surface on screen that has the size of 240 x 180
     res = (1280, 720)
     screen = pygame.display.set_mode(res, pygame.RESIZABLE)
-     
-    # define a variable to control the main loop
+
+    # blit background
     background = pygame.image.load("Background.jpg").convert()
     screen.blit(background, (0,0))
+
+    # draw boxes
+    RED = (200,50,0)
+    YELLOW = (255,200,0)
+    WHITE = (255,255,255)
+    top = 363 
+    RED_BOX = pygame.Rect(1047,top,110,150)
+    YELLOW_BOX = pygame.Rect(860,top,110,150)
+    pygame.draw.rect(screen, RED, RED_BOX)
+    pygame.draw.rect(screen, YELLOW, YELLOW_BOX)
+
+    # define a variable to control the main loop
+
+    scoreboard(screen)
     pygame.key.set_repeat()
     pygame.display.update()
     return screen
@@ -63,14 +82,15 @@ def game_main(screen, motorstring):
             elif event.key == pygame.K_s:
                 motorstring[1] = 1
 
-       elif event.type == RED_GOAL:
-           red_rawscore += 1
-       elif event.type == YELLOW_GOAL:
-           yellow_rawscore += 1
+    #    elif event.type == RED_GOAL:
+    #        red_rawscore += 1
+    #    elif event.type == YELLOW_GOAL:
+    #        yellow_rawscore += 1
      
         # convert motorstring to a string
     motor_save = "".join(str(x) for x in motorstring)
     write_motor_data("motor_data",motor_save)
+    scoreboard(screen)
     try:
         image = pygame.image.load("uploaded_image.jpg").convert()
         screen.blit(image, (50,50))
@@ -79,31 +99,38 @@ def game_main(screen, motorstring):
 
     pygame.display.update()
 
-def scoreboard():
-     pygame.font.init()
+def getscore():
+    goals_read = read_motor_data("goals")
+    goals_arr = goals_read.split(":")
+    return goals_arr
 
-     RED = (255,0,0)
-     YELLOW = (255,255,0)
-     WHITE = (255,255,255)
 
-     SCORE_FONT = pygame.font.SysFont('comicsans',40)
+def scoreboard(screen):
+    SCORE_FONT = pygame.font.SysFont('comicsans',70)
 
-     RED_GOAL = pygame.USEREVENT + 1
-     YELLOW_GOAL = pygame.USEREVENT + 2
+    #  RED_GOAL = pygame.USEREVENT + 1
+    #  YELLOW_GOAL = pygame.USEREVENT + 2
 
-     red_rawscore = 0
-     yellow_rawscore = 0
+    #  red_rawscore = 0
+    #  yellow_rawscore = 0
+    RED = (200,50,0)
+    YELLOW = (255,200,0)
+    WHITE = (255,255,255)
 
-     red_scoreboard = SCORE_FONT.render(str(red_rawscore), 1, WHITE)
-     yellow_scoreboard = SCORE_FONT.render(str(yellow_rawscore), 1, WHITE)
+    score_arr = getscore()
+    yellow_rawscore = score_arr[0]
+    red_rawscore = score_arr[1]
 
-     RED_BOX = pygame.Rect(800,400,50,50)
-     YELLOW_BOX = pygame.Rect(860,400,50,50)
-     pygame.draw.rect(screen, RED, RED_BOX)
-     pygame.draw.rect(screen, YELLOW, YELLOW_BOX)
+    red_scoreboard = SCORE_FONT.render(str(red_rawscore), 1, WHITE)
+    yellow_scoreboard = SCORE_FONT.render(str(yellow_rawscore), 1, WHITE)
      
-     screen.blit(red_scoreboard, (800, 400))
-     screen.blit(yellow_scoreboard, (860, 400))
-
-     pygame.display.update()
      
+    screen.blit(red_scoreboard, (1080, 385))
+    screen.blit(yellow_scoreboard, (890, 385))
+
+    pygame.display.update()
+
+screen = game_setup()
+
+while True:
+    game_main(screen, motor_data)

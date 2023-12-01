@@ -11,7 +11,7 @@
 #define MOTOR_LEFT 4
 #define MOTOR_RIGHT 5
 
-# define trigPin 5
+# define trigPin 19
 # define echoPin 21
 
 // STATES
@@ -33,7 +33,7 @@ const char* ssid = "Berkeley-IoT";
 const char* password = "yNxq)I&2";  //short cam
 
 //Your Domain name with URL path or IP address with path
-String serverName = "http://10.40.67.88";
+String serverName = "http://10.43.67.246";
 const int serverPort = 8000;
 String serverPath = "/motor";
 unsigned long lastTime = 0;
@@ -79,7 +79,7 @@ void loop() {
  Serial.print(data[0]);Serial.print(data[1]);
  Serial.println(" ");
  lin_state = linear_motor(lin_state);
- rot_state = rot_motor(rot_state);}
+ rot_state = rot_motor(rot_state);}}
 
 String getServerRequest(){
   if ((millis() - lastTime) > timerDelay) {
@@ -243,10 +243,7 @@ void scoretracker() {
   
   if (!new_game) {
     if (distance > distance_reset_min && distance < distance_reset_max) {
-      count += 1
-      bool sent = false;
-      while (!sent){
-      sent = goal_scored();}
+      count += 1;
       if (count == 1000) { count = 0; new_game = true; }
     } else {
       count = 0;
@@ -256,10 +253,11 @@ void scoretracker() {
   if (new_game) {
     if (distance <= distance_reset_min || distance >= distance_reset_max) {
       count += 1;
+      if (count == 100) 
+      {count = 0; score += 1; new_game = false;
       bool sent = false;
       while (!sent){
-      sent = goal_scored();}
-      if (count == 100) { count = 0; score += 1; new_game = false; }
+      sent = goal_scored();} }
     } else {
       count = 0;
       }
