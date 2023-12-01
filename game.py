@@ -93,7 +93,9 @@ def game_main(screen, motorstring):
     scoreboard(screen)
     try:
         image = pygame.image.load("uploaded_image.jpg").convert()
-        screen.blit(image, (50,50))
+        image = pygame.Surface.convert(image)
+        image = pygame.transform.scale(image,(640,480))
+        screen.blit(image, (80,42))
     except:
         pass
 
@@ -130,7 +132,7 @@ def scoreboard(screen):
 
     pygame.display.update()
 
-screen = game_setup()
+# screen = game_setup()
 
-while True:
-    game_main(screen, motor_data)
+# while True:
+#     game_main(screen, motor_data)
