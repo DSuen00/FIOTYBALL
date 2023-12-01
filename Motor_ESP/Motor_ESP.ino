@@ -19,6 +19,7 @@
 #define MOTOR_LEFT_P 33
 #define MOTOR_RIGHT_P 15
 
+#define wifiLED 22
 
 // STATES
 #define IDLE 0
@@ -39,7 +40,7 @@ const char* password = "yNxq)I&2";
 // const char* password = "yNxq)I&2";  //short cam
 
 //Your Domain name with URL path or IP address with path
-String serverName = "http://10.43.67.246";
+String serverName = "http://10.44.65.112";
 const int serverPort = 8000;
 String serverPath = "/motor";
 unsigned long lastTime = 0;
@@ -51,10 +52,11 @@ void setup() {
   setup_wifi();
   pinMode(MOTOR_UP_G, OUTPUT); pinMode(MOTOR_DOWN_G, OUTPUT);
   pinMode(MOTOR_LEFT_G, OUTPUT); pinMode(MOTOR_RIGHT_G, OUTPUT);
-  pinMode(LIMIT_UP_G, INPUT_PULLUP); pinMode(LIMIT_DOWN_G, INPUT_PULLUP);
+  pinMode(LIMIT_UP_G, INPUT_PULLDOWN); pinMode(LIMIT_DOWN_G, INPUT_PULLDOWN);
   pinMode(MOTOR_UP_P, OUTPUT); pinMode(MOTOR_DOWN_P, OUTPUT);
   pinMode(MOTOR_LEFT_P, OUTPUT); pinMode(MOTOR_RIGHT_P, OUTPUT);
-  pinMode(LIMIT_UP_P, INPUT_PULLUP); pinMode(LIMIT_DOWN_P, INPUT_PULLUP);}
+  pinMode(LIMIT_UP_P, INPUT_PULLUP); pinMode(LIMIT_DOWN_P, INPUT_PULLUP);
+  pinMode(wifiLED,OUTPUT);}
 
 void loop() {
  data = getServerRequest();
@@ -64,11 +66,10 @@ void loop() {
  rot_state_G = rot_motor_G(rot_state_G);
  lin_state_P = linear_motor_P(lin_state_P);
  rot_state_P = rot_motor_P(rot_state_P);
+ delay(1);
  }
 
 String getServerRequest(){
-  if ((millis() - lastTime) > timerDelay) {
-    //Check WiFi connection status
     if (WiFi.status() == WL_CONNECTED) {
       HTTPClient http;
 
@@ -84,21 +85,24 @@ String getServerRequest(){
       int httpResponseCode = http.GET();
       String payload = "";
       if (httpResponseCode > 0) {
-        // Serial.print("HTTP Response code: ");
-        // Serial.println(httpResponseCode);
-        payload = http.getString();
-        // Serial.println(payload);
-      } else {
-        // Serial.print("Error code: ");
+        Serial.print("HTTP Response code: ");
         Serial.println(httpResponseCode);
+        payload = http.getString();
+        digitalWrite(wifiLED, HIGH);
+        Serial.println(payload);
+      } else {
+        Serial.print("Error code: ");
+        Serial.println(httpResponseCode);
+        digitalWrite(wifiLED, LOW);
       }
       // Free resources
       http.end();
       return payload;
     } else {
       // Serial.println("WiFi Disconnected");
+      WiFi.begin(ssid, password);
     }
-    lastTime = millis();}}
+    lastTime = millis();}
 
 void setup_wifi(){
   WiFi.begin(ssid, password);
@@ -237,7 +241,7 @@ int linear_motor_P(int state){
 
     case NO_UP:
 
-      Serial.println("NO_UP");
+      // Serial.println("NO_UP");
       
       if (digitalRead(LIMIT_UP_P) == LOW) {
         state = IDLE;}
@@ -249,7 +253,7 @@ int linear_motor_P(int state){
     
     case NO_DOWN:
 
-      Serial.println("NO_DOWN");
+      // Serial.println("NO_DOWN");
       
       if (digitalRead(LIMIT_DOWN_P) == LOW) {
         state = IDLE;}
@@ -266,7 +270,7 @@ int rot_motor_G(int state){
 
     case IDLE:
 
-      Serial.println("IDLE");
+      // Serial.println("IDLE");
       
       if (data[motor] == '2') {
         digitalWrite(MOTOR_LEFT_G, HIGH);
@@ -303,7 +307,7 @@ int rot_motor_P(int state){
 
     case IDLE:
 
-      Serial.println("IDLE");
+      // Serial.println("IDLE");
       
       if (data[motor] == '2') {
         digitalWrite(MOTOR_LEFT_P, HIGH);

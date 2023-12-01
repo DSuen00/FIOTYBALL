@@ -118,7 +118,7 @@ def setup_server():
         host = get_local_ip()
         port = 8000
         server = ThreadingHTTPServer((host, port), webserverHandler)
-        server.timeout = 0.3
+        server.timeout = 0.1
         print("Web server running on {}:{}".format(host, port))
         return server
     except:
@@ -138,6 +138,7 @@ def run_server(server):
 
 # while True:
 #     run_server(server)
+#     print("run")
 
 
 # server.handle_request_noblock()

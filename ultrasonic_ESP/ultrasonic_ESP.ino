@@ -1,10 +1,12 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 
-# define trigPinOpp 26
-# define echoPinOpp 25
-# define trigPinPla 12
-# define echoPinPla 27
+# define trigPinOpp 19
+# define echoPinOpp 21
+# define trigPinPla 33
+# define echoPinPla 15
+
+#define newgameLED 22
 
 WiFiClient client;
 
@@ -12,7 +14,7 @@ const char* ssid = "Berkeley-IoT";
 const char* password = "4O#u45S2";
 
 //Your Domain name with URL path or IP address with path
-String serverName = "http://10.43.67.246";
+String serverName = "http://10.44.65.112";
 const int serverPort = 8000;
 
 //define sound speed in 10m/uS
@@ -40,6 +42,7 @@ void setup() {
   setup_wifi();
   pinMode(trigPinPla, OUTPUT); pinMode(echoPinPla, INPUT);
   pinMode(trigPinOpp, OUTPUT); pinMode(echoPinOpp, INPUT);
+  pinMode(newgameLED, OUTPUT);
 }
 
 void loop() {
@@ -75,7 +78,7 @@ void scoretracker() {
     if (distancePla > distance_reset_min_pla && distancePla < distance_reset_max_pla
         && distanceOpp > distance_reset_min_opp && distanceOpp < distance_reset_max_opp) {
       count += 1;
-      if (count == 1000) { count = 0; new_game = true; }
+      if (count == 500) { count = 0; new_game = true; digitalWrite(newgameLED, HIGH);}
     } else {
       count = 0;
       }
@@ -84,16 +87,16 @@ void scoretracker() {
   if (new_game) {
     if (distancePla <= distance_reset_min_pla || distancePla >= distance_reset_max_pla) {
       countPla += 1;
-      if (countPla == 100) 
-      {countPla = 0; new_game = false;
+      if (countPla == 50) 
+      {countPla = 0; new_game = false; digitalWrite(newgameLED, LOW);
       bool sent = false;
       while (!sent){
       sent = sentGoal(true);}}
     } else {countPla = 0;}
     if (distanceOpp <= distance_reset_min_opp || distanceOpp >= distance_reset_max_opp) {
       countOpp += 1;
-      if (countOpp == 100) 
-      {countOpp = 0; new_game = false;
+      if (countOpp == 50) 
+      {countOpp = 0; new_game = false; digitalWrite(newgameLED, LOW);
       bool sent = false;
       while (!sent){
       sent = sentGoal(false);}}
@@ -102,7 +105,8 @@ void scoretracker() {
 
   // Prints the distance in the Serial Monitor
   Serial.print("Distance Pla: "); Serial.print(distancePla);
-  Serial.print("Distance Opp: "); Serial.print(distanceOpp);
+  Serial.print(" Distance Opp: "); Serial.print(distanceOpp);
+  Serial.print(" newgame: "); Serial.println(new_game);
 }
 
 bool sentGoal(bool player){

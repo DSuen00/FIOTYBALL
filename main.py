@@ -1,5 +1,6 @@
 from Comserver import setup_server, run_server
 from game import game_main, game_setup
+import time
 
 server = setup_server()
 screen = game_setup()
@@ -11,3 +12,5 @@ running = True
 while running:
     run_server(server)
     game_main(screen,motor_data, score_arr)
+    print("running")
+    time.sleep(.01)
