@@ -111,10 +111,14 @@ def scoreboard(screen):
 
     score_arr = getscore()
 
-     if score_arr[0] != yellow_rawscore:
-          pygame.draw.rect(screen, YELLOW, YELLOW_BOX)
-     if score_arr[1] != red_rawscore:
-          pygame.draw.rect(screen, RED, RED_BOX)
+    if score_arr[0] != yellow_rawscore:
+        top = 363 
+        YELLOW_BOX = pygame.Rect(860,top,110,150)
+        pygame.draw.rect(screen, YELLOW, YELLOW_BOX)
+    if score_arr[1] != red_rawscore:
+        top = 363
+        RED_BOX = pygame.Rect(1047,top,110,150)
+        pygame.draw.rect(screen, RED, RED_BOX)
      
     yellow_rawscore = score_arr[0]
     red_rawscore = score_arr[1]
