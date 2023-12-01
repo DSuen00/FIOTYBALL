@@ -9,7 +9,7 @@
 WiFiClient client;
 
 const char* ssid = "Berkeley-IoT";
-const char* password = "40#u4552";
+const char* password = "4O#u4552";
 
 //Your Domain name with URL path or IP address with path
 String serverName = "http://10.43.67.246";
