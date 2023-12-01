@@ -118,10 +118,10 @@ def run_server(server):
         server.socket.close()
         return False
 
-server = setup_server()
+# server = setup_server()
 
-while True:
-    run_server(server)
+# while True:
+#     run_server(server)
 
 
 # server.handle_request_noblock()
