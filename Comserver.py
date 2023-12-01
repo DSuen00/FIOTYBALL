@@ -22,17 +22,33 @@ class webserverHandler(SimpleHTTPRequestHandler):
                 print(output)
                 return
 
-            if self.path.endswith("/check"):
+            if self.path.endswith("/pla"):
                 self.send_response(200)
-                self.send_header('Content-Type', 'text/html')
+                self.send_header('Content-Type', 'response')
                 self.end_headers()
-
                 output = ""
-                output += '<html><body>&#161Hola <a href="/hello">Back to Hello</a>'
-                output += '<form method="POST" enctype="multipart/form-data" action="/hello"><h2> What would you like me to say?</h2><input name="message" type="text" /><input type="submit" value="Submit" /></form>'
-                output += '</body></html>'
                 self.wfile.write(output.encode())
-                print(output)
+                goal_data = read_motor_data("goals")
+                goal_data = goal_data.rsplit(":")
+                for x in range(len(goal_data)):
+                    goal_data[x] = int(goal_data[x])
+                goal_data[0] +=1
+                goal_data = str(goal_data[0]) + ":" + str(goal_data[1])
+                write_motor_data("goals",goal_data)
+                return
+            if self.path.endswith("/opp"):
+                self.send_response(200)
+                self.send_header('Content-Type', 'response')
+                self.end_headers()
+                output = ""
+                self.wfile.write(output.encode())
+                goal_data = read_motor_data("goals")
+                goal_data = goal_data.rsplit(":")
+                for x in range(len(goal_data)):
+                    goal_data[x] = int(goal_data[x])
+                goal_data[1] +=1
+                goal_data = str(goal_data[0]) + ":" + str(goal_data[1])
+                write_motor_data("goals",goal_data)
                 return
 
         except IOError:

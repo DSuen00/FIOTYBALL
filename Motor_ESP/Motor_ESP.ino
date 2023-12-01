@@ -6,8 +6,8 @@
 #define LIMIT_UP 27
 #define LIMIT_DOWN 12
 
-#define MOTOR_UP 26
-#define MOTOR_DOWN 25
+#define MOTOR_UP 25
+#define MOTOR_DOWN 26
 #define MOTOR_LEFT 4
 #define MOTOR_RIGHT 5
 
@@ -29,8 +29,8 @@ String data = "1111";
 WiFiClient client;
 
 const char* ssid = "Berkeley-IoT";
-// // const char* password = "0%$MB,(y";
-const char* password = "yNxq)I&2";  //short cam
+const char* password = "yNxq)I&2";
+// const char* password = "yNxq)I&2";  //short cam
 
 //Your Domain name with URL path or IP address with path
 String serverName = "http://10.43.67.246";
@@ -50,8 +50,8 @@ int score = 0;
 int count = 0;
 volatile bool new_game = false;
 
-int distance_reset_min = 5000;
-int distance_reset_max = 10000;
+const int distance_reset_min = 5000;
+const int distance_reset_max = 11000;
 
 
 unsigned long previousTime = 0;
@@ -74,12 +74,13 @@ void loop() {
     digitalWrite(trigPin, LOW);
     scoretracker();
   } else {
-    previousTime = currentTime;
- data = getServerRequest();
- Serial.print(data[0]);Serial.print(data[1]);
- Serial.println(" ");
- lin_state = linear_motor(lin_state);
- rot_state = rot_motor(rot_state);}}
+    previousTime = currentTime;}
+//  data = getServerRequest();
+// //  Serial.print(data[0]);Serial.print(data[1]);
+// //  Serial.println(" ");
+//  lin_state = linear_motor(lin_state);
+//  rot_state = rot_motor(rot_state);
+ }
 
 String getServerRequest(){
   if ((millis() - lastTime) > timerDelay) {
@@ -88,7 +89,7 @@ String getServerRequest(){
       HTTPClient http;
 
       String serverpath = serverName + ":" + String(serverPort) + serverPath;
-      Serial.println(serverpath);
+      // Serial.println(serverpath);
       // Your Domain name with URL path or IP address with path
       http.begin(serverpath.c_str());
 
@@ -99,19 +100,19 @@ String getServerRequest(){
       int httpResponseCode = http.GET();
       String payload = "";
       if (httpResponseCode > 0) {
-        Serial.print("HTTP Response code: ");
-        Serial.println(httpResponseCode);
+        // Serial.print("HTTP Response code: ");
+        // Serial.println(httpResponseCode);
         payload = http.getString();
         // Serial.println(payload);
       } else {
-        Serial.print("Error code: ");
+        // Serial.print("Error code: ");
         Serial.println(httpResponseCode);
       }
       // Free resources
       http.end();
       return payload;
     } else {
-      Serial.println("WiFi Disconnected");
+      // Serial.println("WiFi Disconnected");
     }
     lastTime = millis();}}
 
@@ -130,13 +131,13 @@ int linear_motor(int state){
 
     case IDLE:
 
-      Serial.println("IDLE");
+      // Serial.println("IDLE");
       
-      if (data[1] == '2') {
+      if (data[1] == '0') {
         digitalWrite(MOTOR_UP, HIGH);
         state = UP;}
       
-      if (data[1] == '0') {
+      if (data[1] == '2') {
         digitalWrite(MOTOR_DOWN, HIGH);
         state = DOWN;
       }
@@ -182,7 +183,7 @@ int linear_motor(int state){
       if (digitalRead(LIMIT_UP) == LOW) {
         state = IDLE;}
 
-      if (data[1] == '0') {
+      if (data[1] == '2') {
         digitalWrite(MOTOR_DOWN, HIGH);
         state = DOWN;}
       break;
@@ -194,7 +195,7 @@ int linear_motor(int state){
       if (digitalRead(LIMIT_DOWN) == LOW) {
         state = IDLE;}
 
-      if (data[1] == '2') {
+      if (data[1] == '0') {
         digitalWrite(MOTOR_UP, HIGH);
         state = UP;}
       break;}
@@ -257,7 +258,7 @@ void scoretracker() {
       {count = 0; score += 1; new_game = false;
       bool sent = false;
       while (!sent){
-      sent = goal_scored();} }
+      sent = sentGoal(true);} }
     } else {
       count = 0;
       }
@@ -270,28 +271,35 @@ void scoretracker() {
   Serial.println(score);
 }
 
-bool goal_scored() {
-  Serial.println("Connecting to server: " + serverName);
+bool sentGoal(bool player){
+    bool ret = false;
+    if (WiFi.status() == WL_CONNECTED) {
+      HTTPClient http;
+      String path = "";
+      if (player == true){
+        path = "/pla";
+      } else {path = "/opp";}
+      String serverpath = serverName + ":" + String(serverPort) + path;
+      Serial.println(serverpath);
+      // Your Domain name with URL path or IP address with path
+      http.begin(serverpath.c_str());
 
-  if (client.connect(serverName.c_str(), serverPort)) {
-    Serial.println("Connection successful!");    
+      // If you need Node-RED/server authentication, insert user and password below
+      //http.setAuthorization("REPLACE_WITH_SERVER_USERNAME", "REPLACE_WITH_SERVER_PASSWORD");
 
-  
-    client.println("POST " + serverPath + " HTTP/1.1");
-    client.println("Host: " + serverName);
-    client.println("Content-Length: 3");
-    client.println("Content-Type: goal");
-    client.println();
-    client.println("pla");
-
-    String response = "";
-    while (client.available()) {
-      char c = client.read();
-      response += c;}
-      Serial.print(response);
-    if (response == "200"){return true;}
-    else{return false;}}  
-  else {
-    String getBody = "Connection to " + serverName +  " failed.";
-    Serial.println(getBody);
-    return false;}}
+      // Send HTTP GET request
+      int httpResponseCode = http.GET();
+      Serial.println(httpResponseCode);
+      String payload = "";
+      if (httpResponseCode == 200) {
+        ret = true;
+      } else {
+        ret = false;}
+      // Free resources
+      http.end();
+    } else {
+      // Serial.println("WiFi Disconnected")
+      ret = false;
+    }
+    lastTime = millis();
+    return ret;}
