@@ -11,6 +11,8 @@
 #define MOTOR_LEFT 4
 #define MOTOR_RIGHT 5
 
+# define trigPin 5
+# define echoPin 21
 
 // STATES
 #define IDLE 0
@@ -38,17 +40,41 @@ unsigned long lastTime = 0;
 // Set timer to 5 seconds (5000)
 unsigned long timerDelay = 10;
 
+//define sound speed in 10m/uS
+const int SOUND_SPEED = 34;
+
+long duration;
+int distance;
+
+int score = 0;
+int count = 0;
+volatile bool new_game = false;
+
+int distance_reset_min = 5000;
+int distance_reset_max = 10000;
+
+
+unsigned long previousTime = 0;
+
 void setup() {
   Serial.begin(115200);
   setup_wifi();
   for (int i = 0; i++; i == sizeof(motorGPIO) / sizeof(motorGPIO[0])){
   pinMode(motorGPIO[i], OUTPUT);}
-  pinMode(MOTOR_UP, OUTPUT);
-  pinMode(MOTOR_DOWN, OUTPUT);
-  pinMode(MOTOR_LEFT, OUTPUT);
-  pinMode(MOTOR_RIGHT, OUTPUT);}
+  pinMode(MOTOR_UP, OUTPUT); pinMode(MOTOR_DOWN, OUTPUT);
+  pinMode(MOTOR_LEFT, OUTPUT); pinMode(MOTOR_RIGHT, OUTPUT);
+  pinMode(trigPin, OUTPUT); pinMode(echoPin, INPUT);}
 
 void loop() {
+ unsigned long currentTime = micros();
+  if (currentTime - previousTime < 120) {
+    digitalWrite(trigPin, HIGH);
+//    Serial.print(1);
+  } else if (currentTime - previousTime < 160) {
+    digitalWrite(trigPin, LOW);
+    scoretracker();
+  } else {
+    previousTime = currentTime;
  data = getServerRequest();
  Serial.print(data[0]);Serial.print(data[1]);
  Serial.println(" ");
@@ -211,28 +237,63 @@ int rot_motor(int state){
       break;}
       return state;}
 
-// bool goal_scored() {
-//   Serial.println("Connecting to server: " + serverName);
+void scoretracker() {
+  duration = pulseIn(echoPin, HIGH);
+  distance = duration * SOUND_SPEED/2;
+  
+  if (!new_game) {
+    if (distance > distance_reset_min && distance < distance_reset_max) {
+      count += 1
+      bool sent = false;
+      while (!sent){
+      sent = goal_scored();}
+      if (count == 1000) { count = 0; new_game = true; }
+    } else {
+      count = 0;
+      }
+  }
 
-//   if (client.connect(serverName.c_str(), serverPort)) {
-//     Serial.println("Connection successful!");    
+  if (new_game) {
+    if (distance <= distance_reset_min || distance >= distance_reset_max) {
+      count += 1;
+      bool sent = false;
+      while (!sent){
+      sent = goal_scored();}
+      if (count == 100) { count = 0; score += 1; new_game = false; }
+    } else {
+      count = 0;
+      }
+  }
+
+  // Prints the distance in the Serial Monitor
+  Serial.print("Distance : ");
+  Serial.print(distance);
+  Serial.print("   Score : ");
+  Serial.println(score);
+}
+
+bool goal_scored() {
+  Serial.println("Connecting to server: " + serverName);
+
+  if (client.connect(serverName.c_str(), serverPort)) {
+    Serial.println("Connection successful!");    
 
   
-//     client.println("POST " + serverPath + " HTTP/1.1");
-//     client.println("Host: " + serverName);
-//     client.println("Content-Length: 3");
-//     client.println("Content-Type: goal");
-//     client.println();
-//     client.println("pla");
+    client.println("POST " + serverPath + " HTTP/1.1");
+    client.println("Host: " + serverName);
+    client.println("Content-Length: 3");
+    client.println("Content-Type: goal");
+    client.println();
+    client.println("pla");
 
-//     String response = "";
-//     while (client.available()) {
-//       char c = client.read();
-//       response += c;}
-//       Serial.print(response);
-//     if (response == "200"){return true;}
-//     else{return false;}}  
-//   else {
-//     String getBody = "Connection to " + serverName +  " failed.";
-//     Serial.println(getBody);
-//     return false;}}
+    String response = "";
+    while (client.available()) {
+      char c = client.read();
+      response += c;}
+      Serial.print(response);
+    if (response == "200"){return true;}
+    else{return false;}}  
+  else {
+    String getBody = "Connection to " + serverName +  " failed.";
+    Serial.println(getBody);
+    return false;}}
