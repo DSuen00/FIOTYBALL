@@ -119,18 +119,21 @@ def scoreboard(screen, score_arr):
         if score_arr[1] != old_score[1]:
             RED_BOX = pygame.Rect(1047,top,110,150)
             pygame.draw.rect(screen, RED, RED_BOX)
+        
+        yellow_rawscore = score_arr[0]
+        red_rawscore = score_arr[1]
+
+        red_scoreboard = SCORE_FONT.render(str(red_rawscore), 1, WHITE)
+        yellow_scoreboard = SCORE_FONT.render(str(yellow_rawscore), 1, WHITE)
+     
+     
+        screen.blit(red_scoreboard, (1080, 385))
+        screen.blit(yellow_scoreboard, (890, 385))
     except:
         pass
      
-    yellow_rawscore = score_arr[0]
-    red_rawscore = score_arr[1]
 
-    red_scoreboard = SCORE_FONT.render(str(red_rawscore), 1, WHITE)
-    yellow_scoreboard = SCORE_FONT.render(str(yellow_rawscore), 1, WHITE)
-     
-     
-    screen.blit(red_scoreboard, (1080, 385))
-    screen.blit(yellow_scoreboard, (890, 385))
+
 
     pygame.display.update()
 

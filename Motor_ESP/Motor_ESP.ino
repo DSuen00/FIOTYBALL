@@ -4,7 +4,7 @@
 //PINOUTS
 
 #define LIMIT_UP_G 19
-#define LIMIT_DOWN_G 21
+#define LIMIT_DOWN_G 20
 
 #define MOTOR_UP_G 25
 #define MOTOR_DOWN_G 26
@@ -40,7 +40,7 @@ const char* password = "yNxq)I&2";
 // const char* password = "yNxq)I&2";  //short cam
 
 //Your Domain name with URL path or IP address with path
-String serverName = "http://10.44.65.112";
+String serverName = "http://10.43.64.152";
 const int serverPort = 8000;
 String serverPath = "/motor";
 unsigned long lastTime = 0;
@@ -52,10 +52,10 @@ void setup() {
   setup_wifi();
   pinMode(MOTOR_UP_G, OUTPUT); pinMode(MOTOR_DOWN_G, OUTPUT);
   pinMode(MOTOR_LEFT_G, OUTPUT); pinMode(MOTOR_RIGHT_G, OUTPUT);
-  pinMode(LIMIT_UP_G, INPUT_PULLDOWN); pinMode(LIMIT_DOWN_G, INPUT_PULLDOWN);
+  pinMode(LIMIT_UP_G, INPUT_PULLDOWN); pinMode(LIMIT_DOWN_G, INPUT_PULLUP);
   pinMode(MOTOR_UP_P, OUTPUT); pinMode(MOTOR_DOWN_P, OUTPUT);
   pinMode(MOTOR_LEFT_P, OUTPUT); pinMode(MOTOR_RIGHT_P, OUTPUT);
-  pinMode(LIMIT_UP_P, INPUT_PULLUP); pinMode(LIMIT_DOWN_P, INPUT_PULLUP);
+  pinMode(LIMIT_UP_P, INPUT_PULLDOWN); pinMode(LIMIT_DOWN_P, INPUT_PULLDOWN);
   pinMode(wifiLED,OUTPUT);}
 
 void loop() {
@@ -66,6 +66,8 @@ void loop() {
  rot_state_G = rot_motor_G(rot_state_G);
  lin_state_P = linear_motor_P(lin_state_P);
  rot_state_P = rot_motor_P(rot_state_P);
+ Serial.println(digitalRead(LIMIT_DOWN_G));
+ Serial.println(digitalRead(LIMIT_UP_G));
  delay(1);
  }
 
@@ -241,7 +243,7 @@ int linear_motor_P(int state){
 
     case NO_UP:
 
-      // Serial.println("NO_UP");
+      Serial.println("NO_UP");
       
       if (digitalRead(LIMIT_UP_P) == LOW) {
         state = IDLE;}
@@ -253,7 +255,7 @@ int linear_motor_P(int state){
     
     case NO_DOWN:
 
-      // Serial.println("NO_DOWN");
+      Serial.println("NO_DOWN");
       
       if (digitalRead(LIMIT_DOWN_P) == LOW) {
         state = IDLE;}

@@ -64,8 +64,11 @@ class webserverHandler(SimpleHTTPRequestHandler):
             image_data = form_data
             self.send_response(200)
             # Save the image data to a file
-            with open("uploaded_image.jpg", "wb") as image_file:
-                image_file.write(image_data)
+            try:
+                with open("uploaded_image.jpg", "wb") as image_file:
+                    image_file.write(image_data)
+            except:
+                pass
 
         elif content_type.startswith('trainingdata'):
             # Process the multipart data

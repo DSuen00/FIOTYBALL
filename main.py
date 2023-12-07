@@ -12,5 +12,4 @@ running = True
 while running:
     run_server(server)
     game_main(screen,motor_data, score_arr)
-    print("running")
     time.sleep(.01)

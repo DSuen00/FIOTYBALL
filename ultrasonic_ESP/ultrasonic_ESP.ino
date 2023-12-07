@@ -14,7 +14,7 @@ const char* ssid = "Berkeley-IoT";
 const char* password = "4O#u45S2";
 
 //Your Domain name with URL path or IP address with path
-String serverName = "http://10.44.65.112";
+String serverName = "http://10.43.64.152";
 const int serverPort = 8000;
 
 //define sound speed in 10m/uS

@@ -20,7 +20,7 @@ const char* ssid = "Berkeley-IoT";
 const char* password = "0uW8&mx,"; //short cam
 
 
-String serverName = "10.44.65.112";   // REPLACE WITH YOUR Raspberry Pi IP ADDRESS
+String serverName = "10.43.64.152";   // REPLACE WITH YOUR Raspberry Pi IP ADDRESS
 String serverPath = "/motor";     // The default serverPath should be upload.php
 
 const int serverPort = 8000;
@@ -48,6 +48,9 @@ WiFiClient client;
 
 const int timerInterval = 1;    // time between each HTTP POST image
 unsigned long previousMillis = 0;   // last time image was sent
+camera_fb_t * fb = NULL;
+uint8_t *fbBuf = NULL;
+size_t fbLen = NULL;
 
 void setup() {
   WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0); 
@@ -103,7 +106,7 @@ void setup() {
   esp_err_t err = esp_camera_init(&config);
   if (err != ESP_OK) {
     Serial.printf("Camera init failed with error 0x%x", err);
-    delay(1000);
+    delay(500);
     ESP.restart();
   }
 
@@ -112,13 +115,12 @@ void setup() {
 
 void loop() {
   sendPhoto();
+  delay(50);
 }
 
 String sendPhoto() {
   String getAll;
   String getBody;
-
-  camera_fb_t * fb = NULL;
   fb = esp_camera_fb_get();
   if(!fb) {
     Serial.println("Camera capture failed");
@@ -133,16 +135,15 @@ String sendPhoto() {
 
     uint32_t imageLen = fb->len;
     // uint32_t extraLen = head.length() + tail.length();
-    uint32_t totalLen = imageLen;
   
     client.println("POST " + serverPath + " HTTP/1.1");
     client.println("Host: " + serverName);
-    client.println("Content-Length: " + String(totalLen));
+    client.println("Content-Length: " + String(imageLen));
     client.println("Content-Type: multipart/form-data");
     client.println();
   
-    uint8_t *fbBuf = fb->buf;
-    size_t fbLen = fb->len;
+    fbBuf = fb->buf;
+    fbLen = fb->len;
     for (size_t n=0; n<fbLen; n=n+1024) {
       if (n+1024 < fbLen) {
         client.write(fbBuf, 1024);
@@ -162,5 +163,4 @@ String sendPhoto() {
     Serial.println(getBody);
   }
   return getBody;
-  delay(1);
 }
