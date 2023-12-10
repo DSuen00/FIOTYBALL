@@ -61,7 +61,7 @@ void setup() {
   pinMode(wifiLED,OUTPUT);}
 
 void loop() {
- data = getServerRequest();
+ data = getServerRequest(); //get keyboard input data from the server, saves in in data
  Serial.print(data[0]);Serial.print(data[1]);
  Serial.println(" ");
  lin_state_G = linear_motor_G(lin_state_G); // tells motors for linear movement what to do
@@ -79,25 +79,22 @@ String getServerRequest(){
 
       String serverpath = serverName + ":" + String(serverPort) + serverPath;
       // Serial.println(serverpath);
-      // Your Domain name with URL path or IP address with path
       http.begin(serverpath.c_str());
-
-      // If you need Node-RED/server authentication, insert user and password below
-      //http.setAuthorization("REPLACE_WITH_SERVER_USERNAME", "REPLACE_WITH_SERVER_PASSWORD");
 
       // Send HTTP GET request
       int httpResponseCode = http.GET();
       String payload = "";
+
       if (httpResponseCode > 0) {
         Serial.print("HTTP Response code: ");
         Serial.println(httpResponseCode);
-        payload = http.getString();
-        digitalWrite(wifiLED, HIGH);
+        payload = http.getString(); //save server response in a string
+        digitalWrite(wifiLED, HIGH); //turn LED on to indicate successful connection
         Serial.println(payload);
       } else {
         Serial.print("Error code: ");
         Serial.println(httpResponseCode);
-        digitalWrite(wifiLED, LOW);
+        digitalWrite(wifiLED, LOW); //turn LED off to indicate failed connection
       }
       // Free resources
       http.end();
@@ -108,6 +105,7 @@ String getServerRequest(){
     }
     lastTime = millis();}
 
+//this sets up the wifi object
 void setup_wifi(){
   WiFi.begin(ssid, password);
   Serial.println("Connecting");
