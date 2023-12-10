@@ -16,8 +16,8 @@ const char* ssid = "sleepy";
 const char* password = "pleasew0rk";
 
 String serverName = "http://192.168.229.42";  //server address
-//Your Domain name with URL path or IP address with path
-const int serverPort = 8000;
+
+const int serverPort = 8000; //Your Domain name with URL path or IP address with path
 
 //define sound speed in 10m/uS
 const int SOUND_SPEED = 34; // used later on for distance calculation
@@ -64,7 +64,7 @@ void loop() {
 }
 
 void setup_wifi(){
-  WiFi.begin(ssid, password);
+  WiFi.begin(ssid, password); //start wifi connection
   Serial.println("Connecting");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
@@ -123,6 +123,8 @@ bool sentGoal(bool player){
     if (WiFi.status() == WL_CONNECTED) {
       HTTPClient http;
       String path = "";
+
+      // Change the server path according to who score the goal
       if (player == true){
         path = "/pla";
       } else {path = "/opp";}
@@ -131,13 +133,12 @@ bool sentGoal(bool player){
       // Your Domain name with URL path or IP address with path
       http.begin(serverpath.c_str());
 
-      // If you need Node-RED/server authentication, insert user and password below
-      //http.setAuthorization("REPLACE_WITH_SERVER_USERNAME", "REPLACE_WITH_SERVER_PASSWORD");
-
       // Send HTTP GET request
       int httpResponseCode = http.GET();
       Serial.println(httpResponseCode);
       String payload = "";
+
+      // Check if the server successfully received the request
       if (httpResponseCode == 200) {
         ret = true;
       } else {
