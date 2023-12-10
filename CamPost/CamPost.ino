@@ -21,8 +21,8 @@ const char* ssid = "sleepy";
 const char* password = "pleasew0rk";
 
 String serverName = "192.168.229.42";
-// String serverName = "10.44.65.112";   // REPLACE WITH YOUR Raspberry Pi IP ADDRESS
-String serverPath = "/motor";     // The default serverPath should be upload.php
+// String serverName = "10.44.65.112";   
+String serverPath = "/motor"; 
 
 const int serverPort = 8000;
 
@@ -119,6 +119,7 @@ void loop() {
   delay(50);
 }
 
+
 String sendPhoto() {
   String getAll;
   String getBody;
@@ -130,7 +131,7 @@ String sendPhoto() {
   }
   
   Serial.println("Connecting to server: " + serverName);
-
+  // send POST request with jpeg data
   if (client.connect(serverName.c_str(), serverPort)) {
     Serial.println("Connection successful!");    
 
