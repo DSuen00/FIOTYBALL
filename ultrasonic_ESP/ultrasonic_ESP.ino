@@ -6,7 +6,7 @@
 # define trigPinPla 33
 # define echoPinPla 15
 
-#define newgameLED 22
+# define newgameLED 22 // LED that lights up when a new game has started (start tracking for a goal); off when a goal has been made
 
 WiFiClient client;
 
@@ -15,21 +15,23 @@ WiFiClient client;
 const char* ssid = "sleepy";
 const char* password = "pleasew0rk";
 
-String serverName = "http://192.168.229.42";
+String serverName = "http://192.168.229.42";  //server address
 //Your Domain name with URL path or IP address with path
-// String serverName = "http://10.44.65.112";
 const int serverPort = 8000;
 
 //define sound speed in 10m/uS
-const int SOUND_SPEED = 34;
+const int SOUND_SPEED = 34; // used later on for distance calculation
 
-long durationOpp; int distanceOpp;
+// duration = amount of time taken for echo pin to receive signal from trigger bounce, distance = distance from ultrasonic sensor
+long durationOpp; int distanceOpp; 
 long durationPla; int distancePla;
 
 int score = 0;
-int count = 0; int countOpp = 0; int countPla = 0;
+int count = 0; int countOpp = 0; int countPla = 0; // count used to ensure consistency in data output to filter out noise for accurate detection of goals
 volatile bool new_game = false;
 
+
+// calibrating the distances of each ultrasonic sensor
 const int distance_reset_min_opp = 6000;
 const int distance_reset_max_opp = 13000;
 
@@ -45,11 +47,11 @@ void setup() {
   setup_wifi();
   pinMode(trigPinPla, OUTPUT); pinMode(echoPinPla, INPUT);
   pinMode(trigPinOpp, OUTPUT); pinMode(echoPinOpp, INPUT);
-  pinMode(newgameLED, OUTPUT);
+  pinMode(newgameLED, OUTPUT); 
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  // to obtain the distance within the goal
   unsigned long currentTime = micros();
   if (currentTime - previousTime < 120) {
     digitalWrite(trigPinPla, HIGH); digitalWrite(trigPinOpp, HIGH);
@@ -72,38 +74,41 @@ void setup_wifi(){
   Serial.println(WiFi.localIP());}
 
 void scoretracker() {
+  // to detect the duration of the trigger bounceback and then calculate the distance of any object in the goal
   durationPla = pulseIn(echoPinPla, HIGH);
   distancePla = durationPla * SOUND_SPEED/2;
   durationOpp = pulseIn(echoPinOpp, HIGH);
   distanceOpp = durationOpp * SOUND_SPEED/2;
-  
+
+  // after a goal has been made; ensures that goals are empty before starting to try and detect a new goal
   if (!new_game) {
     if (distancePla > distance_reset_min_pla && distancePla < distance_reset_max_pla
-        && distanceOpp > distance_reset_min_opp && distanceOpp < distance_reset_max_opp) {
+        && distanceOpp > distance_reset_min_opp && distanceOpp < distance_reset_max_opp) { // checks that distances output by sensors are within the normal range of having nothing in the goals
       count += 1;
-      if (count == 500) { count = 0; new_game = true; digitalWrite(newgameLED, HIGH);}
+      if (count == 500) { count = 0; new_game = true; digitalWrite(newgameLED, HIGH);} // if distance is consistently within the range, start a new game and beginning tracking for a goal
     } else {
-      count = 0;
+      count = 0; // restarting counting due to noise
       }
   }
 
+  // after starting a new game, begin tracking for a goal to be scored
   if (new_game) {
-    if (distancePla <= distance_reset_min_pla || distancePla >= distance_reset_max_pla) {
+    if (distancePla <= distance_reset_min_pla || distancePla >= distance_reset_max_pla) { // if player's goal detects something in the goal
       countPla += 1;
       if (countPla == 50) 
-      {countPla = 0; new_game = false; digitalWrite(newgameLED, LOW);
+      {countPla = 0; new_game = false; digitalWrite(newgameLED, LOW); // if distance is consistently within range, confirm that player has scored a goal
       bool sent = false;
       while (!sent){
-      sent = sentGoal(true);}}
-    } else {countPla = 0;}
-    if (distanceOpp <= distance_reset_min_opp || distanceOpp >= distance_reset_max_opp) {
+      sent = sentGoal(true);}} // sending to server that a goal has been made
+    } else {countPla = 0;} // restarts counter due to noise
+    if (distanceOpp <= distance_reset_min_opp || distanceOpp >= distance_reset_max_opp) { // if opponent's goal detects something in the goal
       countOpp += 1;
       if (countOpp == 50) 
-      {countOpp = 0; new_game = false; digitalWrite(newgameLED, LOW);
+      {countOpp = 0; new_game = false; digitalWrite(newgameLED, LOW); // if distance is consistently within range, confirm that opponent has scored a goal
       bool sent = false;
       while (!sent){
-      sent = sentGoal(false);}}
-    } else {countOpp = 0;}
+      sent = sentGoal(false);}} // sending to server that a goal has been made
+    } else {countOpp = 0;} // restarts counter due to noise
   }
 
   // Prints the distance in the Serial Monitor
@@ -112,6 +117,7 @@ void scoretracker() {
   Serial.print(" newgame: "); Serial.println(new_game);
 }
 
+// to tell server to change score of player/opponent when a goal has been made
 bool sentGoal(bool player){
     bool ret = false;
     if (WiFi.status() == WL_CONNECTED) {
