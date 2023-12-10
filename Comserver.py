@@ -5,55 +5,84 @@ import socket
 import os
 
 
-
+# This object defines how the http server deals with requests
 class webserverHandler(SimpleHTTPRequestHandler):
     """docstring for webserverHandler"""
 
+    # Defining how the server responds to HTTP get requests
     def do_GET(self):
         try:
+            # When http//(server address)/motor is called
+            # This address is only called by the ESP32 controlling the motors, and returns the keyboard input stored in the motor_data file
             if self.path.endswith("/motor"):
                 self.send_response(200)
                 self.send_header('Content-Type', 'data')
                 self.end_headers()
+
+                # Reads data from the motor_data file
                 data = read_motor_data("motor_data")
                 output = ""
+                # Sends data to the client
                 output += data
                 self.wfile.write(output.encode())
                 print(output)
                 return
 
+            # When http//(server address)/pla is called
+            # This address is requested by the ESP32 with ultrasonic sensors, and is called when a goal is scored by the player
             if self.path.endswith("/pla"):
                 self.send_response(200)
+                # Tells the ESP32 the goal has been registered
                 self.send_header('Content-Type', 'response')
                 self.end_headers()
                 output = ""
                 self.wfile.write(output.encode())
+
+                # Reads the current record of goals scored
                 goal_data = read_motor_data("goals")
+                # Stores current goals into an array
                 goal_data = goal_data.rsplit(":")
                 for x in range(len(goal_data)):
                     goal_data[x] = int(goal_data[x])
+
+                # Increment the corresponding goal
                 goal_data[0] +=1
                 goal_data = str(goal_data[0]) + ":" + str(goal_data[1])
+
+                # write the goal data back into the file
                 write_motor_data("goals",goal_data)
                 return
+            
+            # When http//(server address)/opp is called
+            # This address is requested by the ESP32 with ultrasonic sensors, and is called when a goal is scored by the player
             if self.path.endswith("/opp"):
+                # Tells the ESP32 the goal has been registered
                 self.send_response(200)
                 self.send_header('Content-Type', 'response')
                 self.end_headers()
                 output = ""
                 self.wfile.write(output.encode())
+
+                 # Reads the current record of goals scored
                 goal_data = read_motor_data("goals")
+
+                # Stores current goals into an array
                 goal_data = goal_data.rsplit(":")
                 for x in range(len(goal_data)):
                     goal_data[x] = int(goal_data[x])
+
+                # Increment the corresponding goal
                 goal_data[1] +=1
                 goal_data = str(goal_data[0]) + ":" + str(goal_data[1])
+                # write the goal data back into the file
                 write_motor_data("goals",goal_data)
                 return
 
         except IOError:
             self.send_error(404, "File not found %s" % self.path)
 
+     # Defining how the server responds to HTTP POST requests
+    #  These requests are only sent by the ESP-CAM
     def do_POST(self):
         content_length = int(self.headers['Content-Length'])
         content_type = self.headers['Content-Type']
@@ -81,28 +110,8 @@ class webserverHandler(SimpleHTTPRequestHandler):
                 image_file.write(image_data)
             file_name = int(read_motor_data("datacount")) + 1
             write_motor_data("datacount", file_name)
-
-        elif content_type.startswith('goal'):
-            form_data = self.rfile.read(content_length)
-            goal_data = read_motor_data("goals")
-            goal_data = goal_data.rsplit(":")
-            for x in range(len(goal_data)):
-                goal_data[x] = int(goal_data[x])
-            if form_data == "pla":
-                goal_data[0] +=1
-            elif form_data == "opp":
-                goal_data[1]+=1
-            else:
-                self.send_response(100)
-                return
-            goal_data = str(goal_data[0]) + ":" + str(goal_data[1])
-            write_motor_data("goals",goal_data)
-            self.send_response(200)
-
-
-        # Respond with a success message
         
-
+# This function prints the ip address the server is being hosted on
 def get_local_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
@@ -114,7 +123,9 @@ def get_local_ip():
     finally:
         s.close()
     return IP
- 
+
+
+# this function runs once to set up the server
 def setup_server():
 
     try:
@@ -127,6 +138,7 @@ def setup_server():
     except:
         pass
 
+# This function runs continously
 def run_server(server):
     try:
         # server.serve_forever()
