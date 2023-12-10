@@ -10,28 +10,31 @@
 
 WiFiClient client;
 
-const char* ssid = "Berkeley-IoT";
-const char* password = "4O#u45S2";
+// const char* ssid = "Berkeley-IoT";
+// const char* password = "4O#u45S2";
+const char* ssid = "sleepy";
+const char* password = "pleasew0rk";
 
+String serverName = "http://192.168.229.42";
 //Your Domain name with URL path or IP address with path
-String serverName = "http://10.43.64.152";
+// String serverName = "http://10.44.65.112";
 const int serverPort = 8000;
 
 //define sound speed in 10m/uS
 const int SOUND_SPEED = 34;
 
 long durationOpp; int distanceOpp;
-long durationPla;int distancePla;
+long durationPla; int distancePla;
 
 int score = 0;
 int count = 0; int countOpp = 0; int countPla = 0;
 volatile bool new_game = false;
 
-const int distance_reset_min_opp = 5000;
-const int distance_reset_max_opp = 11000;
+const int distance_reset_min_opp = 6000;
+const int distance_reset_max_opp = 13000;
 
-const int distance_reset_min_pla = 5000;
-const int distance_reset_max_pla = 11000;
+const int distance_reset_min_pla = 6000;
+const int distance_reset_max_pla = 10000;
 
 unsigned long previousTime = 0;
 unsigned long lastTime = 0;

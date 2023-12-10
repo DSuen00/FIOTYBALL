@@ -15,12 +15,13 @@
 #include "soc/rtc_cntl_reg.h"
 #include "esp_camera.h"
 
-const char* ssid = "Berkeley-IoT";
-// const char* password = "0%$MB,(y";
-const char* password = "0uW8&mx,"; //short cam
+const char* ssid = "sleepy";
+// const char* password = "APt,L1b+";
+// const char* password = "vC',TT30"; //short cam
+const char* password = "pleasew0rk";
 
-
-String serverName = "10.43.64.152";   // REPLACE WITH YOUR Raspberry Pi IP ADDRESS
+String serverName = "192.168.229.42";
+// String serverName = "10.44.65.112";   // REPLACE WITH YOUR Raspberry Pi IP ADDRESS
 String serverPath = "/motor";     // The default serverPath should be upload.php
 
 const int serverPort = 8000;

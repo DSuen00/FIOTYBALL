@@ -35,12 +35,14 @@ int rot_state_P = 0;
 String data = "1111";
 WiFiClient client;
 
-const char* ssid = "Berkeley-IoT";
-const char* password = "yNxq)I&2";
-// const char* password = "yNxq)I&2";  //short cam
+const char* ssid = "sleepy";
+// const char* password = "yNxq)I&2";
+// const char* password = ")7)lf!MQ";  //micro-USB
+const char* password = "pleasew0rk";
 
 //Your Domain name with URL path or IP address with path
-String serverName = "http://10.43.64.152";
+// String serverName = "http://10.44.65.112";
+String serverName = "http://192.168.229.42";
 const int serverPort = 8000;
 String serverPath = "/motor";
 unsigned long lastTime = 0;
